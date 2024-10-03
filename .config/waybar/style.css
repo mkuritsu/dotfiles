@@ -1,0 +1,40 @@
+@define-color base #1f2335;
+@define-color text #c0caf5;
+@define-color accent #9d7cd8;
+@define-color warning #ff9e64;
+
+* {
+    background: @base;
+    color: @text;
+    font-family: "JetbrainsMono SemiBold";
+}
+
+.modules-right {
+    padding-right: 10px;
+}
+
+.modules-left {
+    padding-left: 10px;
+}
+
+#custom-separator {
+    padding: 0px 10px;
+}
+
+#workspaces button {
+    box-shadow: none;
+    text-shadow: none;
+    border-radius: 0;
+    border: none;
+    padding: 0px 3px;
+    border-bottom: 2px solid @text;
+}
+
+#workspaces button.active {
+    color: @accent;
+    border-bottom: 2px solid @accent;
+}
+
+#workspaces button.urgent {
+    border-bottom: 2px solid @warning;
+}
