@@ -1,0 +1,5 @@
+@theme "catppucin-default"
+
+configuration {
+    show-icons: true;
+}
