@@ -12,6 +12,7 @@
     ],
     "modules-center": [],
     "modules-right": [
+        "custom/recording",
         "tray",
         "pulseaudio",
         "network",
@@ -52,5 +53,11 @@
             ]
         },
         "on-click": "pavucontrol"
+    },
+    "custom/recording": {
+        "format": "● {}",
+        "interval": 1,
+        "exec": "echo REC",
+        "exec-if": "pgrep wf-recorder"
     }
 }
