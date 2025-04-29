@@ -13,6 +13,7 @@ compinit
 # End of lines added by compinstall
 
 alias ls='ls --color=auto'
+alias code='codium --ozone-platform=wayland'
 
 bindkey "^[[1;5C" forward-word
 bindkey "^[[1;5D" backward-word

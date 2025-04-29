@@ -13,6 +13,7 @@
     "modules-center": [],
     "modules-right": [
         "custom/recording",
+        "custom/notifications-bell",
         "tray",
         "pulseaudio",
         "network",
@@ -24,11 +25,12 @@
     },
     "clock": {
         "format": "{:%H:%M %d-%m-%Y}",
-        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>"
+        "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+        "on-click": "gnome-calendar"
     },
     "network": {
         "family": "ipv4",
-        "format-ethernet": "192.168.1.65/24 ", // hardcoded until waybar fixes the family parameter
+        "format-ethernet": "{ipaddr}/{cidr} ",
         "format-disconnected": "Disconnected ⚠"
     },
     "pulseaudio": {
@@ -59,5 +61,13 @@
         "interval": 1,
         "exec": "echo REC",
         "exec-if": "pgrep wf-recorder"
+    },
+    "custom/notifications-bell": {
+        "format": "{}",
+        "tooltip": false,
+        "interval": 1,
+        "exec-on-event": true,
+        "exec": "$HOME/.config/waybar/modules/notifications_bell.sh",
+        "on-click": "dunstctl set-paused toggle"
     }
 }

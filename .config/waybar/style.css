@@ -35,12 +35,17 @@ window#waybar {
 #pulseaudio,
 #network,
 #window,
-#tray {
+#tray,
+#notifications-bell {
   padding: 0 14px;
 }
 
 #tray menu {
   background: #181825;
+}
+
+#tray {
+  border-bottom: 4px solid #f38ba8;
 }
 
 #clock {
