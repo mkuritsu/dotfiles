@@ -30,9 +30,7 @@ Note: the dotfiles are configured to use nautilus as the file-manager but that c
 
 ### Arch
 
-There are two main possible ways to install these dotfiles:
-1. symlink all wanted files into the respective directories (recommended)
-2. git clone this repository into your home directory (the filenames are setup to make that possible) 
+The recommended way to install is to create a symlink for each file in the respective directory.
 
 ### NixOS
 

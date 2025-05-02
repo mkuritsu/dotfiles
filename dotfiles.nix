@@ -1,5 +1,5 @@
 # If using nix, this should be included as a home-manger module in the imports
-{ home, ... }:
+{ pkgs, ... }:
 {
   home.file.".config/btop/btop.conf".source = ./.config/btop/btop.conf;
   home.file.".config/btop/themes/catppuccin_mocha.theme".source =
@@ -12,7 +12,7 @@
   home.file.".config/hypr/hyprland.conf".source = ./.config/hypr/hyprland.conf;
   home.file.".config/hypr/hyprpaper.conf".source = ./.config/hypr/hyprpaper.conf;
 
-  home.file.".config/waybar/config.json".source = ./.config/waybar/config.json;
+  home.file.".config/waybar/config.jsonc".source = ./.config/waybar/config.jsonc;
   home.file.".config/waybar/style.css".source = ./.config/waybar/style.css;
   home.file.".config/waybar/modules/notifications_bell.sh".source =
     ./.config/waybar/modules/notifications_bell.sh;
