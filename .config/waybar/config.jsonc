@@ -16,7 +16,6 @@
         "custom/notifications-bell",
         "tray",
         "pulseaudio",
-        "network",
         "clock"
     ],
     "tray": {
