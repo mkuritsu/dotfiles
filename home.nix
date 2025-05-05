@@ -1,8 +1,9 @@
-{ pkgs, standalone ? false, ... }: {
+{ pkgs, ... }@inputs:
+let
+  standalone =
+    if builtins.hasAttr "standalone" inputs then inputs.standalone else false;
+in {
   home.stateVersion = "24.11";
-
-  home.username = "kuritsu";
-  home.homeDirectory = "/home/kuritsu";
 
   dconf.settings = {
     "org/gnome/desktop/interface" = { color-scheme = "prefer-dark"; };
@@ -29,6 +30,7 @@
 
   programs = {
     home-manager.enable = true;
+
     zsh = pkgs.lib.mkIf (!standalone) {
       enable = true;
       enableCompletion = true;
