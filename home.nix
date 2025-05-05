@@ -31,7 +31,7 @@ in {
   programs = {
     home-manager.enable = true;
 
-    zsh = pkgs.lib.mkIf (!standalone) {
+    zsh = {
       enable = true;
       enableCompletion = true;
       autosuggestion.enable = true;
@@ -44,7 +44,7 @@ in {
       };
     };
 
-    direnv = pkgs.lib.mkIf (!standalone) {
+    direnv = {
       enable = true;
       enableBashIntegration = true;
       enableZshIntegration = true;
