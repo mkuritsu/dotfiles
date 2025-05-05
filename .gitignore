@@ -1,1 +1,16 @@
-.direnv
+*
+
+!.envrc
+!.gitignore
+!.zshrc
+!flake.lock
+!flake.nix
+!home.nix
+!README.md
+
+!.config/btop
+!.config/dunst
+!.config/foot
+!.config/hypr
+!.config/waybar
+!.config/wofi
