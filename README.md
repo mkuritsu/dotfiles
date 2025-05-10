@@ -28,9 +28,9 @@
 ### Any distro
 
 There are 3 possible ways to install these dotfiles:
-1. clone this repostiory somewhere and symlink all files to the correct destination
+1. clone this repostiory somewhere and symlink all files to the correct destination (stow can be used)
 2. using nix, run `nix develop` and then `home-manager switch --flake .` it will install and symlink all files for you.
-3. simply clone this repository into your home directory
+3. simply clone this repository into your home directory (not recommended)
 
 ### NixOS
 
