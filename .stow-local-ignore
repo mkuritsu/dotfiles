@@ -1,0 +1,7 @@
+.git
+.gitignore
+flake.nix
+home.nix
+flake.lock
+README.md
+setup.sh
