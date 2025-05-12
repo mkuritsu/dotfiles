@@ -3,6 +3,8 @@ HISTSIZE=100000
 SAVEHIST=100000
 unsetopt beep
 
+export PATH="$HOME/.local/bin:$PATH"
+
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 
