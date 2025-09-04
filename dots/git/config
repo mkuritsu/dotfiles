@@ -1,0 +1,12 @@
+[core]
+editor = "nvim"
+
+[init]
+defaultBranch = "main"
+
+[pull]
+rebase = true
+
+[user]
+email = "mkuritsuu@gmail.com"
+name = "mkuritsu"
