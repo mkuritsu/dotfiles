@@ -33,6 +33,4 @@ in
   home.packages = with pkgs; [
     app2unit
   ];
-
-  programs.home-manager.enable = true;
 }
