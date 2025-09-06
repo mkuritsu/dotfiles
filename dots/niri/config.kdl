@@ -1,4 +1,3 @@
-spawn-at-startup "xwayland-satellite"
 spawn-at-startup "mako"
 spawn-at-startup "swww-daemon"
 spawn-at-startup "kushell"

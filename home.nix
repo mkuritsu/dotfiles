@@ -12,7 +12,7 @@ let
     else
       builtins.throw "HOME variable not set!";
 
-  isNixOS = builtins.getEnv "NIXOS" == "1";
+  isNixOs = builtins.pathExists "/run/current-system/nixos-version";
 in
 {
   home = {
@@ -25,7 +25,7 @@ in
     ./modules/gtk.nix
     ./modules/xdg.nix
   ]
-  ++ lib.optionals isNixOS [
+  ++ lib.optionals isNixOs [
     ./modules/browser.nix
     ./modules/neovim.nix
   ];
