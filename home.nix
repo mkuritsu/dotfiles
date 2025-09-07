@@ -22,10 +22,10 @@ in
 
   imports = [
     ./files.nix
-    ./modules/gtk.nix
-    ./modules/xdg.nix
   ]
   ++ lib.optionals isNixOs [
+    ./modules/gtk.nix
+    ./modules/xdg.nix
     ./modules/browser.nix
     ./modules/neovim.nix
   ];

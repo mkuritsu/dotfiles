@@ -42,6 +42,8 @@ in
       mkOutOfStoreSymlink ./dots/fish/functions/fish_greeting.fish;
 
     "nvim".source = mkOutOfStoreSymlink ./dots/nvim;
+
+    "xdg-desktop-portal/Hyprland-portals.conf".source = ./dots/xdg-desktop-portal/Hyprland-portals.conf;
   };
 
 }
