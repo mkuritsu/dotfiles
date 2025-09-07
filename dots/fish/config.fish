@@ -3,3 +3,5 @@ status is-interactive; and begin
         starship init fish | source
     end
 end
+
+fish_add_path $HOME/.local/bin/

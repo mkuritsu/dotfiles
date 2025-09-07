@@ -1,6 +1,5 @@
-spawn-at-startup "mako"
 spawn-at-startup "swww-daemon"
-spawn-at-startup "kushell"
+spawn-at-startup "quickshell" "-c" "noctalia-shell"
 
 environment {
     DISPLAY ":0"
