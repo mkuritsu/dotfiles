@@ -72,6 +72,7 @@ in
         nvim-treesitter.withAllGrammars
         nvim-treesitter-textobjects
         mason-nvim
+        neo-tree-nvim
       ];
 
       dev.myconfig = {
