@@ -6,7 +6,7 @@ environment {
 }
 
 cursor {
-    xcursor-theme "catppuccin-mocha-dark-cursors"
+    xcursor-theme "Adwaita"
     xcursor-size 24
 }
 
