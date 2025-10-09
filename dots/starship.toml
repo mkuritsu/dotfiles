@@ -1,12 +1,12 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = false
-format = "$username$directory$git_branch$character"
+format = '┌─\[ $username$directory$git_branch$nix_shell$container$line_break$character'
 line_break = false
 
 [character]
-error_symbol = "[~>](bold red)"
-success_symbol = "[~>](bold green)"
+error_symbol = "└─>"
+success_symbol = "└─>"
 
 [git_branch]
 format = "[$symbol$branch(:$remote_branch)]($style) "
@@ -15,3 +15,13 @@ symbol = " "
 [username]
 format = "[$user]($style) "
 show_always = true
+
+[container]
+symbol = "📦"
+
+[nix_shell]
+format = '[$symbol (\($name\))]($style) '
+symbol = "❄️"
+
+[fill]
+symbol = " "

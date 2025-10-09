@@ -1,5 +1,5 @@
 spawn-at-startup "swww-daemon"
-spawn-at-startup "quickshell" "-c" "noctalia-shell"
+spawn-at-startup "noctalia-shell"
 
 environment {
     DISPLAY ":0"
@@ -35,6 +35,7 @@ input {
 
     touchpad {
         tap
+        dwt
         natural-scroll
     }
 
@@ -140,9 +141,6 @@ workspace "8" {
     open-on-output "DP-1"
 }
 workspace "9" {
-    open-on-output "DP-1"
-}
-workspace "10" {
     open-on-output "DP-1"
 }
 

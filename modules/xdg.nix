@@ -1,4 +1,5 @@
-_: {
+{ ... }:
+{
   xdg = {
     userDirs = {
       enable = true;
@@ -7,7 +8,8 @@ _: {
     terminal-exec = {
       enable = true;
       settings = {
-        default = [ "kitty.desktop" ];
+        GNOME = [ "ghostty.desktop" ];
+        default = [ "ghostty.desktop" ];
       };
     };
   };

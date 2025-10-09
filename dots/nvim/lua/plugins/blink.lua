@@ -25,5 +25,6 @@ return {
         show_with_menu = true
       }
     },
+    fuzzy = { implementation = "prefer_rust_with_warning" }
   }
 }

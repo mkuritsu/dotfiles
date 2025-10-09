@@ -16,4 +16,3 @@ vim.opt.scrolloff = 10
 -- Misc
 vim.opt.clipboard = "unnamedplus"
 vim.opt.swapfile = false
-vim.opt.shell = "fish"

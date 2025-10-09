@@ -33,6 +33,12 @@ return {
       end
     },
     {
+      "<leader>d",
+      function()
+        Snacks.explorer()
+      end
+    },
+    {
       "<leader>g",
       function()
         Snacks.picker.grep()

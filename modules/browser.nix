@@ -1,4 +1,4 @@
-_:
+{ pkgs, ... }:
 let
   mkFirefoxExtensions =
     extensions:
@@ -29,6 +29,9 @@ in
 
   programs.chromium = {
     enable = true;
+    package = pkgs.chromium.override {
+      enableWideVine = true;
+    };
 
     extensions = [
       "nngceckbapebfimnlniiiahkandclblb" # bitwarden

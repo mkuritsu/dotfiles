@@ -1,31 +1,21 @@
-{ lib, pkgs, ... }:
-let
-  username =
-    if (builtins.getEnv "USER") != "" then
-      builtins.getEnv "USER"
-    else
-      builtins.throw "USER variable not set!";
-
-  homeDirectory =
-    if (builtins.getEnv "HOME") != "" then
-      builtins.getEnv "HOME"
-    else
-      builtins.throw "HOME variable not set!";
-
-  isNixOs = builtins.pathExists "/run/current-system/nixos-version";
-in
+username: homeDirectory: isNixOS:
+{
+  lib,
+  pkgs,
+  ...
+}:
 {
   home = {
-    stateVersion = "25.05";
+    stateVersion = "25.11";
     inherit username homeDirectory;
   };
 
   imports = [
-    ./files.nix
+    (import ./files.nix true)
     ./modules/gtk.nix
     ./modules/xdg.nix
   ]
-  ++ lib.optionals isNixOs [
+  ++ lib.optionals isNixOS [
     ./modules/browser.nix
     ./modules/neovim.nix
   ];

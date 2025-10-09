@@ -19,7 +19,7 @@ return {
     config = function()
       require("catppuccin").setup {
         flavour = "mocha",
-        transparent_background = false,
+        transparent_background = vim.env.XDG_CURRENT_DESKTOP == "Hyprland",
         float = {
           solid = false,
           transparent = true

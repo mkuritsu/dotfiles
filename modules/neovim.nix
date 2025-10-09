@@ -3,16 +3,21 @@
   pkgs,
   lib,
   ...
-}:
+}@args:
 let
-  sources = import ../npins;
-  mnw = import sources.mnw;
+  inputs =
+    if (lib.hasAttr "inputs" args) then
+      args.inputs
+    else
+      {
+        mnw = import (import ../npins).mnw;
+      };
 
   inherit (config.lib.file) mkOutOfStoreSymlink;
 in
 {
   imports = [
-    mnw.homeManagerModules.default
+    inputs.mnw.homeManagerModules.default
   ];
 
   home.sessionVariables.EDITOR = lib.mkOverride 900 "nvim";
@@ -27,6 +32,7 @@ in
       fzf
       ripgrep
       fd
+      ghostscript
 
       # LSPs
       lua-language-server
@@ -53,10 +59,6 @@ in
       ];
 
       opt = with pkgs.vimPlugins; [
-        # dependencies
-        plenary-nvim
-        nui-nvim
-
         catppuccin-nvim
         tokyonight-nvim
         lualine-nvim
@@ -72,13 +74,9 @@ in
         nvim-treesitter.withAllGrammars
         nvim-treesitter-textobjects
         mason-nvim
-        neo-tree-nvim
       ];
 
-      dev.myconfig = {
-        pure = ../dots/nvim;
-        impure = mkOutOfStoreSymlink ../dots/nvim;
-      };
+      dev.myconfig.pure = ../dots/nvim;
     };
   };
 }
