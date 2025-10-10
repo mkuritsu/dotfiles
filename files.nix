@@ -50,7 +50,8 @@ in
 
     "niri/config.kdl".source = sourceFile ./dots/niri/config.kdl;
 
-    "btop/btop.conf".source = sourceFile ./dots/btop/btop.conf;
+    # don't use sourceFile for btop to force to stay in nix-store since btop likes to write to config file for some reason
+    "btop/btop.conf".source = ./dots/btop/btop.conf;
     "btop/themes".source = sourceFile ./dots/btop/themes;
 
     "git/config".source = sourceFile ./dots/git/config;
