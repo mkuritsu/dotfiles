@@ -6,7 +6,13 @@ useSymlinks:
 }:
 let
   inherit (config.lib.file) mkOutOfStoreSymlink;
-  sourceFile = path: if useSymlinks then mkOutOfStoreSymlink path else path;
+  parsePath =
+    path:
+    builtins.replaceStrings
+      [ (builtins.toString ./.) ]
+      [ "${builtins.getEnv "FLAKE_ROOT"}/users/kuritsu/dotfiles" ]
+      (builtins.toString path);
+  sourceFile = path: if useSymlinks then mkOutOfStoreSymlink (parsePath path) else parsePath path;
 
   stripPath = path: str: builtins.replaceStrings [ (builtins.toString path) ] [ "" ] str;
   substr1 = str: builtins.substring 1 (builtins.stringLength str) str;
