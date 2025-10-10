@@ -1,26 +1,12 @@
-username: homeDirectory: isNixOS:
+{ pkgs, ... }:
 {
-  lib,
-  pkgs,
-  ...
-}:
-{
-  home = {
-    stateVersion = "25.11";
-    inherit username homeDirectory;
-  };
-
   imports = [
-    (import ./files.nix true)
+    ./files.nix
     ./modules/gtk.nix
     ./modules/xdg.nix
-  ]
-  ++ lib.optionals isNixOS [
-    ./modules/browser.nix
-    ./modules/neovim.nix
   ];
 
   home.packages = with pkgs; [
-    app2unit
+    app2unit # here because not commonly packaged in other distros
   ];
 }

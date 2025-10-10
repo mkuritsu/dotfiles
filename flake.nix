@@ -4,6 +4,9 @@
   outputs =
     { ... }:
     {
-      home = ./home.nix;
+      homeManagerModules = {
+        default = ./home.nix;
+        full = ./home-nixos.nix;
+      };
     };
 }

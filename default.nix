@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 let
   username =
     if (builtins.getEnv "USER") != "" then
@@ -15,7 +15,15 @@ let
   isNixOs = builtins.pathExists "/run/current-system/nixos-version";
 in
 {
+  home = {
+    stateVersion = "25.11";
+    inherit username homeDirectory;
+  };
+
   imports = [
-    (import ./home.nix username homeDirectory isNixOs)
+    ./home.nix
+  ]
+  ++ lib.optionals isNixOs [
+    ./home-nixos.nix
   ];
 }
