@@ -5,4 +5,3 @@ theme = "TokyoNight"
 command = "fish"
 window-padding-x = 0
 window-padding-y = 0
-gtk-single-instance = true

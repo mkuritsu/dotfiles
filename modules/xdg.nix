@@ -9,7 +9,7 @@
       enable = true;
       settings = {
         GNOME = [ "ghostty.desktop" ];
-        default = [ "ghostty.desktop" ];
+        default = [ "kitty.desktop" ];
       };
     };
   };
