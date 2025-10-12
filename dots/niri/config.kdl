@@ -1,5 +1,4 @@
 spawn-at-startup "swww-daemon"
-spawn-at-startup "noctalia-shell"
 
 environment {
     DISPLAY ":0"
