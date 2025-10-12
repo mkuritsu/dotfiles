@@ -1,5 +1,3 @@
-spawn-at-startup "swww-daemon"
-
 environment {
     DISPLAY ":0"
 }
