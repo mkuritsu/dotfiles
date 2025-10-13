@@ -9,9 +9,9 @@ return {
     },
     config = function()
       require("nvim-treesitter.configs").setup {
-        -- ensure_installed = { "rust", "c", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
-        -- sync_install = false,
-        -- auto_install = true,
+        ensure_installed = { "rust", "c", "cpp", "python", "c_sharp", "nix", "java", "javascript", "typescript", "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline" },
+        sync_install = false,
+        auto_install = true,
         highlight = {
           enable = true,
           additional_vim_regex_highlighting = false

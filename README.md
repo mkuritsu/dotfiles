@@ -7,7 +7,7 @@ making it easier to share between non nixos systems.
 
 To install the dotfiles nix and home-manager are used:
 ```bash
-home-manager switch -f home.nix
+home-manager switch -f default.nix -b backup
 ```
 
 If the system is a NixOS system you can pass NIXOS=1 as environment variable to the above command to add extra modules:

@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ ... }:
 let
   username =
     if (builtins.getEnv "USER") != "" then
@@ -11,8 +11,6 @@ let
       builtins.getEnv "HOME"
     else
       builtins.throw "HOME variable not set!";
-
-  isNixOs = builtins.pathExists "/run/current-system/nixos-version";
 in
 {
   home = {
@@ -22,8 +20,5 @@ in
 
   imports = [
     ./home.nix
-  ]
-  ++ lib.optionals isNixOs [
-    ./home-nixos.nix
   ];
 }
