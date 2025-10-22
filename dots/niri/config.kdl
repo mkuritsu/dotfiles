@@ -1,9 +1,7 @@
-environment {
-    DISPLAY ":0"
-}
+spawn-at-startup "dms" "run"
 
 cursor {
-    xcursor-theme "Adwaita"
+    xcursor-theme "macOS"
     xcursor-size 24
 }
 
@@ -113,40 +111,40 @@ hotkey-overlay {
     skip-at-startup
 }
 
-workspace "1" {
-    open-on-output "DP-1"
-}
-workspace "2" {
-    open-on-output "DP-1"
-}
-workspace "3" {
-    open-on-output "DP-1"
-}
-workspace "4" {
-    open-on-output "DP-1"
-}
-workspace "5" {
-    open-on-output "DP-1"
-}
-workspace "6" {
-    open-on-output "DP-1"
-}
-workspace "7" {
-    open-on-output "DP-1"
-}
-workspace "8" {
-    open-on-output "DP-1"
-}
-workspace "9" {
-    open-on-output "DP-1"
-}
+// workspace "1" {
+//     open-on-output "DP-1"
+// }
+// workspace "2" {
+//     open-on-output "DP-1"
+// }
+// workspace "3" {
+//     open-on-output "DP-1"
+// }
+// workspace "4" {
+//     open-on-output "DP-1"
+// }
+// workspace "5" {
+//     open-on-output "DP-1"
+// }
+// workspace "6" {
+//     open-on-output "DP-1"
+// }
+// workspace "7" {
+//     open-on-output "DP-1"
+// }
+// workspace "8" {
+//     open-on-output "DP-1"
+// }
+// workspace "9" {
+//     open-on-output "DP-1"
+// }
 
 binds {
     // launching/closing apps
     Mod+C { close-window; }
-    Mod+Q { spawn "kitty"; }
+    Mod+Q { spawn "ghostty"; }
     Mod+R { spawn "fuzzel" "--launch-prefix" "niri msg action spawn --"; }
-    Mod+E { spawn "nautilus"; }
+    Mod+E { spawn "dolphin"; }
     Mod+Y { spawn "hyprpicker" "--lowercase-hex" "--autocopy"; }
 
     // workspaces
@@ -221,8 +219,8 @@ binds {
     Mod+Period { expel-window-from-column; }
 
     Mod+Shift+R { switch-preset-column-width; }
-    Mod+F { maximize-column; }
-    Mod+Shift+F { fullscreen-window; }
+    Mod+Shift+F { maximize-column; }
+    Mod+F { fullscreen-window; }
     Mod+Ctrl+F { expand-column-to-available-width; }
     Mod+Ctrl+C { center-visible-columns; }
 
