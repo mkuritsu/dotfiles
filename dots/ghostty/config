@@ -7,3 +7,5 @@ background-opacity = 0.9
 window-padding-x = 0
 window-padding-y = 0
 window-padding-balance = false
+quit-after-last-window-closed = false
+gtk-single-instance = true
