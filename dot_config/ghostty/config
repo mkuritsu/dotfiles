@@ -1,0 +1,11 @@
+command = zsh
+theme = "Catppuccin Mocha"
+background-opacity = 0.9
+font-family = "CaskaydiaMono Nerd Font"
+font-size = 12
+gtk-custom-css = style.css
+gtk-wide-tabs = false
+quit-after-last-window-closed = false
+shell-integration-features = ssh-terminfo,ssh-env
+window-padding-color = extend
+resize-overlay = never
