@@ -9,6 +9,7 @@ vim.opt.wrap = false
 vim.opt.scrolloff = 10
 vim.opt.swapfile = false
 vim.opt.clipboard = "unnamedplus"
+vim.opt.splitright = true
 
 vim.g.editorconfig = true
 
