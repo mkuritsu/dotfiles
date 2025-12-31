@@ -1,3 +1,5 @@
+local enable_transparency = true
+
 return {
 	{
 		"catppuccin/nvim",
@@ -6,7 +8,7 @@ return {
 		priority = 1000,
 		opts = {
 			flavour = "mocha",
-			transparent_background = true,
+			transparent_background = enable_transparency,
 			no_italic = true,
 		},
 	},
@@ -17,7 +19,7 @@ return {
 		opts = {
 			commentStyle = { italic = false },
 			keywordStyle = { italic = false },
-			transparent = true,
+			transparent = enable_transparency,
 		},
 	},
 	{
@@ -27,7 +29,7 @@ return {
 		opts = {
 			variant = "main",
 			dim_inactive_windows = true,
-			styles = { italic = false, transparency = true },
+			styles = { italic = false, transparency = enable_transparency },
 		},
 	},
 }
