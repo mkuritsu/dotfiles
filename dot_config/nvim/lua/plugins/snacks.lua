@@ -3,10 +3,19 @@ return {
 	priority = 1000,
 	lazy = false,
 	opts = {
-		explorer = { enabled = true },
 		picker = { enabled = true },
 		indent = { enabled = true },
 		notifier = { enabled = true },
+
+		explorer = { enabled = false },
+		bigfile = { enabled = false },
+		dashboard = { enabled = false },
+		input = { enabled = false },
+		quickfile = { enabled = false },
+		scope = { enabled = false },
+		scroll = { enabled = false },
+		statuscolumn = { enabled = false },
+		words = { enabled = false },
 	},
 	keys = {
 		{
@@ -25,13 +34,13 @@ return {
 				Snacks.picker.grep()
 			end,
 		},
-		{
-			"<leader>e",
-			mode = "n",
-			desc = "Explorer",
-			function()
-				Snacks.explorer()
-			end,
-		},
+		-- {
+		-- 	"<leader>e",
+		-- 	mode = "n",
+		-- 	desc = "Explorer",
+		-- 	function()
+		-- 		Snacks.explorer()
+		-- 	end,
+		-- },
 	},
 }

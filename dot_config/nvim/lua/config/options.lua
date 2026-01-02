@@ -12,8 +12,8 @@ vim.opt.clipboard = "unnamedplus"
 vim.opt.splitright = true
 
 vim.g.editorconfig = true
+vim.g.colorscheme = "moonfly"
+vim.g.transparent = true
 
 vim.diagnostic.config({ virtual_text = true })
 vim.diagnostic.enable = true
-
-vim.cmd.colorscheme("catppuccin")

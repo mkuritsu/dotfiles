@@ -1,5 +1,5 @@
 command = zsh
-theme = "Catppuccin Mocha"
+theme = "Moonfly"
 background-opacity = 0.9
 font-family = "CaskaydiaMono Nerd Font"
 font-size = 12
