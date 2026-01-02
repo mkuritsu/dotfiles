@@ -1,3 +1,7 @@
+autoload zmv
+autoload -Uz edit-command-line
+zle -N edit-command-line
+
 export HISTFILE="$HOME/.zsh_history"
 export HISTSIZE=100000
 export SAVEHIST=100000
@@ -13,6 +17,13 @@ cd_fzf() {
 }
 zle -N cd_fzf
 
+chpwd() {
+    if [[ -d .venv ]]; then
+        echo "Python environment found! Loading"
+        source .venv/bin/activate
+    fi
+}
+
 bindkey '^F' cd_fzf
 bindkey "^[[1;5C" forward-word
 bindkey "^[[1;5D" backward-word
@@ -21,7 +32,10 @@ bindkey "^[[1;3D" backward-word
 bindkey  "^[[H"   beginning-of-line
 bindkey  "^[[F"   end-of-line
 bindkey  "^[[3~"  delete-char
-bindkey '^H' backward-kill-word
+bindkey "^H" backward-kill-word
+bindkey "^z" undo
+bindkey "^r" redo
+bindkey "^e" edit-command-line
 
 alias ls='ls --color=auto'
 alias ip='ip --color=auto'
