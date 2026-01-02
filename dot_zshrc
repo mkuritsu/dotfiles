@@ -8,6 +8,14 @@ export SAVEHIST=100000
 export SHELL=zsh
 export PATH="$HOME/.local/bin:${PATH}"
 
+# pnpm
+export PNPM_HOME="/home/kuritsu/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end
+
 cd_fzf() {
     dir=$(find ~/ ~/Dev . -mindepth 1 -maxdepth 1 \( -type d -o -type l \) | fzf)
     if [ -n "${dir}" ]; then
@@ -29,9 +37,9 @@ bindkey "^[[1;5C" forward-word
 bindkey "^[[1;5D" backward-word
 bindkey "^[[1;3C" forward-word
 bindkey "^[[1;3D" backward-word
-bindkey  "^[[H"   beginning-of-line
-bindkey  "^[[F"   end-of-line
-bindkey  "^[[3~"  delete-char
+bindkey "^[[H" beginning-of-line
+bindkey "^[[F" end-of-line
+bindkey "^[[3~" delete-char
 bindkey "^H" backward-kill-word
 bindkey "^z" undo
 bindkey "^r" redo
@@ -40,6 +48,7 @@ bindkey "^e" edit-command-line
 alias ls='ls --color=auto'
 alias ip='ip --color=auto'
 alias grep='grep --color=auto'
+alias wget="wget --hsts-file=/dev/null"
 
 eval "$(starship init zsh)"
 
