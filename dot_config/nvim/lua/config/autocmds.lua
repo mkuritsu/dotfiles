@@ -1,26 +1,28 @@
-local LAST_COLORSCHEME_FILE = vim.fn.stdpath("cache") .. "/last_colorscheme"
-
-vim.api.nvim_create_autocmd("BufWritePre", {
-	callback = function(event)
-		require("conform").format({ bufnr = event.buf })
-	end,
-})
-
 vim.api.nvim_create_autocmd("TextYankPost", {
 	callback = function()
 		vim.highlight.on_yank()
 	end,
 })
 
-vim.api.nvim_create_autocmd("ColorScheme", {
-	callback = function()
-		vim.fn.mkdir(vim.fn.stdpath("cache"), "p")
-		vim.fn.writefile({ vim.g.colors_name }, LAST_COLORSCHEME_FILE)
+vim.api.nvim_create_autocmd("VimEnter", {
+	once = true,
+	callback = function(event)
+		if event.file then
+			local dir = event.file
+			if vim.startswith(dir, "oil://") then
+				dir = dir:sub(7)
+			end
+			if vim.fn.isdirectory(dir) == 0 then
+				dir = vim.fn.fnamemodify(dir, ":h")
+			end
+			vim.cmd.cd(dir)
+		end
 	end,
 })
 
-local colorscheme = vim.g.colorscheme
-if vim.fn.filereadable(LAST_COLORSCHEME_FILE) == 1 then
-	colorscheme = vim.fn.readfile(LAST_COLORSCHEME_FILE)[1]
-end
-vim.cmd.colorscheme(colorscheme)
+vim.api.nvim_create_autocmd("ColorScheme", {
+	callback = function()
+		vim.fn.mkdir(vim.fn.stdpath("cache"), "p")
+		vim.fn.writefile({ vim.g.colors_name }, vim.g.colorscheme_storage)
+	end,
+})
