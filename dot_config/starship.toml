@@ -28,3 +28,5 @@ symbol = " "
 
 [python]
 format = "[\\(venv\\)](blue) "
+detect_extensions = []
+detect_folders = []

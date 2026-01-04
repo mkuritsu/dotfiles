@@ -1,5 +1,6 @@
 [core]
 editor = "nvim"
+pager = "delta"
 
 [init]
 defaultBranch = "main"
@@ -14,3 +15,10 @@ signingKey = "094F2AF25C054BDE"
 
 [commit]
 gpgSign = true
+
+[interactive]
+diffFilter = "delta --color-only"
+
+[delta]
+navigate = true
+side-by-side = true
