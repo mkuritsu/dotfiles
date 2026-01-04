@@ -17,11 +17,20 @@ return {
 			lua = { "stylua" },
 			javascript = { "prettierd", "prettier", stop_after_first = true },
 			nix = { "alejandra" },
+			c = { "clang-format" },
+			cpp = { "clang-format" },
 		},
 		default_format_opts = {
 			lsp_format = "fallback",
 		},
 		format_on_save = { timeout_ms = 500, lsp_format = "fallback" },
+		formatters = {
+			["clang-format"] = {
+				args = {
+					"--fallback-style=Microsoft",
+				},
+			},
+		},
 	},
 	init = function()
 		vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"
