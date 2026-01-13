@@ -1,9 +1,11 @@
 [Added Associations]
 application/pdf=org.kde.okular.desktop;
 image/jpeg=imv-dir-2.desktop;
+text/plain=nvim.desktop;
 text/x-todo-txt=nvim.desktop;
 
 [Default Applications]
 application/pdf=org.kde.okular.desktop;
 image/jpeg=imv-dir-2.desktop;
+text/plain=nvim.desktop;
 text/x-todo-txt=nvim.desktop;
