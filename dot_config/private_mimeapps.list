@@ -1,13 +1,35 @@
 [Added Associations]
 application/pdf=org.kde.okular.desktop;
+application/x-compressed-tar=org.kde.ark.desktop;
 application/zip=org.kde.ark.desktop;
 image/jpeg=imv-dir-2.desktop;
 text/plain=nvim.desktop;
 text/x-todo-txt=nvim.desktop;
+x-scheme-handler/http=zen.desktop;
+x-scheme-handler/https=zen.desktop;
+x-scheme-handler/chrome=zen.desktop;
+text/html=zen.desktop;
+application/x-extension-htm=zen.desktop;
+application/x-extension-html=zen.desktop;
+application/x-extension-shtml=zen.desktop;
+application/xhtml+xml=zen.desktop;
+application/x-extension-xhtml=zen.desktop;
+application/x-extension-xht=zen.desktop;
 
 [Default Applications]
 application/pdf=org.kde.okular.desktop;
+application/x-compressed-tar=org.kde.ark.desktop;
 application/zip=org.kde.ark.desktop;
 image/jpeg=imv-dir-2.desktop;
 text/plain=nvim.desktop;
 text/x-todo-txt=nvim.desktop;
+x-scheme-handler/http=zen.desktop
+x-scheme-handler/https=zen.desktop
+x-scheme-handler/chrome=zen.desktop
+text/html=zen.desktop
+application/x-extension-htm=zen.desktop
+application/x-extension-html=zen.desktop
+application/x-extension-shtml=zen.desktop
+application/xhtml+xml=zen.desktop
+application/x-extension-xhtml=zen.desktop
+application/x-extension-xht=zen.desktop
