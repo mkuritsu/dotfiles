@@ -1,3 +1,5 @@
+local js_formatters = { "biome", "prettierd", "prettier", stop_after_first = true }
+
 return {
 	"stevearc/conform.nvim",
 	event = { "BufWritePre" },
@@ -14,23 +16,20 @@ return {
 	},
 	opts = {
 		formatters_by_ft = {
-			lua = { "stylua" },
-			javascript = { "prettierd", "prettier", stop_after_first = true },
-			nix = { "alejandra" },
-			c = { "clang-format" },
+			typescript = js_formatters,
+			typescriptreact = js_formatters,
+			javascript = js_formatters,
+			javascriptreact = js_formatters,
+			astro = js_formatters,
 			cpp = { "clang-format" },
+			c = { "clang-format" },
+			lua = { "stylua" },
+			nix = { "alejandra" },
 		},
 		default_format_opts = {
 			lsp_format = "fallback",
 		},
-		format_on_save = { timeout_ms = 500, lsp_format = "fallback" },
-		-- formatters = {
-		-- 	["clang-format"] = {
-		-- 		args = {
-		-- 			"--fallback-style=Microsoft",
-		-- 		},
-		-- 	},
-		-- },
+		format_on_save = { timeout_ms = 1000, lsp_format = "fallback" },
 	},
 	init = function()
 		vim.o.formatexpr = "v:lua.require'conform'.formatexpr()"

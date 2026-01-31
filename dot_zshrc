@@ -8,6 +8,7 @@ export HISTSIZE=100000
 export SAVEHIST=100000
 export SHELL=zsh
 export PATH="$HOME/.local/bin:${PATH}"
+export PATH="$HOME/.cargo/bin:${PATH}"
 
 # pnpm
 export PNPM_HOME="/home/kuritsu/.local/share/pnpm"

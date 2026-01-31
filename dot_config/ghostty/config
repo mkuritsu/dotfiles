@@ -1,11 +1,6 @@
-theme = "Moonfly"
+theme = "Catppuccin Macchiato"
 font-family = "JetBrainsMonoNL Nerd Font"
-# font-family = "CaskaydiaMono Nerd Font"
 font-size = 11
-quit-after-last-window-closed = false
 shell-integration-features = ssh-terminfo,ssh-env
 window-padding-color = extend
-resize-overlay = never
-
-gtk-custom-css = style.css
-gtk-wide-tabs = false
+quit-after-last-window-closed = false

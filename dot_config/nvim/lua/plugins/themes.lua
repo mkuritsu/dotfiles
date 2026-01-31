@@ -71,4 +71,13 @@ return {
 			},
 		},
 	},
+	{
+		"astronvim/astrotheme",
+		lazy = true,
+		opts = {
+			style = {
+				transparent = vim.g.transparent,
+			},
+		},
+	},
 }
