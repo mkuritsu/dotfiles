@@ -1,5 +1,5 @@
 [Default Applications]
-application/pdf=org.kde.okular.desktop
+application/pdf=org.gnome.Evince.desktop
 application/x-compressed-tar=org.gnome.FileRoller.desktop
 application/x-extension-htm=zen.desktop
 application/x-extension-html=zen.desktop
@@ -157,7 +157,7 @@ x-scheme-handler/mailto=helium.desktop
 x-scheme-handler/terminal=com.mitchellh.ghostty.desktop
 
 [Added Associations]
-application/pdf=org.kde.okular.desktop
+application/pdf=org.kde.okular.desktop;org.gnome.Evince.desktop;
 application/x-compressed-tar=org.kde.ark.desktop;org.gnome.FileRoller.desktop;
 application/x-extension-htm=zen.desktop
 application/x-extension-html=zen.desktop
