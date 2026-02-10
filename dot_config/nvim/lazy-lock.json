@@ -2,6 +2,7 @@
   "astrotheme": { "branch": "main", "commit": "4163138098bb0c933919bf1a799ab50c9b94f865" },
   "blink.cmp": { "branch": "main", "commit": "f85eb6252f4c0212be15c6c4213e9af587574cbe" },
   "catppuccin": { "branch": "main", "commit": "beaf41a30c26fd7d6c386d383155cbd65dd554cd" },
+  "cloak.nvim": { "branch": "main", "commit": "648aca6d33ec011dc3166e7af3b38820d01a71e4" },
   "conform.nvim": { "branch": "master", "commit": "c2526f1cde528a66e086ab1668e996d162c75f4f" },
   "cord.nvim": { "branch": "master", "commit": "6a0c0387abd4a4d1e65d6e83a274452a91f9ccd2" },
   "everforest": { "branch": "main", "commit": "557bce922401e247a596583679bc181d4d688554" },
