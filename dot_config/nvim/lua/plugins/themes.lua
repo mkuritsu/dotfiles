@@ -2,7 +2,6 @@ return {
 	{
 		"catppuccin/nvim",
 		name = "catppuccin",
-		lazy = true,
 		priority = 1000,
 		opts = {
 			flavour = "mocha",
@@ -13,7 +12,6 @@ return {
 	{
 		"rebelot/kanagawa.nvim",
 		name = "kanagawa",
-		lazy = true,
 		priority = 1000,
 		opts = {
 			commentStyle = { italic = false },
@@ -24,7 +22,6 @@ return {
 	{
 		"rose-pine/neovim",
 		name = "rose-pine",
-		lazy = true,
 		priority = 1000,
 		opts = {
 			variant = "main",
@@ -35,7 +32,6 @@ return {
 	{
 		"neanias/everforest-nvim",
 		name = "everforest",
-		lazy = true,
 		priority = 1000,
 		opts = {
 			background = "hard",
@@ -44,7 +40,6 @@ return {
 	},
 	{
 		"mellow-theme/mellow.nvim",
-		lazy = true,
 		priority = 1000,
 		config = function()
 			vim.g.mellow_transparent = vim.g.transparent
@@ -53,7 +48,6 @@ return {
 	{
 		"bluz71/vim-moonfly-colors",
 		name = "moonfly",
-		lazy = true,
 		priority = 1000,
 		config = function()
 			vim.g.moonflyItalics = false
@@ -73,7 +67,6 @@ return {
 	},
 	{
 		"astronvim/astrotheme",
-		lazy = true,
 		opts = {
 			style = {
 				transparent = vim.g.transparent,
