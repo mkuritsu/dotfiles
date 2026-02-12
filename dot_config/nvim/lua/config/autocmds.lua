@@ -1,9 +1,11 @@
+-- highlight on yank
 vim.api.nvim_create_autocmd("TextYankPost", {
 	callback = function()
 		vim.highlight.on_yank()
 	end,
 })
 
+-- change working directory when opening neovim with ("nvim <path>")
 vim.api.nvim_create_autocmd("VimEnter", {
 	once = true,
 	callback = function(event)

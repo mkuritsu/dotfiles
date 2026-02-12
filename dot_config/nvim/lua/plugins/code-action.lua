@@ -3,7 +3,7 @@ return {
 	opts = {},
 	keys = {
 		{
-			"<leader>ca",
+			"gra",
 			mode = "n",
 			desc = "Code actions",
 			function()

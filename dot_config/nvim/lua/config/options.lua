@@ -10,11 +10,14 @@ vim.opt.scrolloff = 10
 vim.opt.swapfile = false
 vim.opt.clipboard = "unnamedplus"
 vim.opt.splitright = true
+vim.opt.cursorline = true
 
 vim.diagnostic.enable = true
 vim.diagnostic.config({ virtual_text = true })
 
 vim.g.editorconfig = true
-vim.g.default_colorscheme = "moonfly"
+vim.g.default_colorscheme = "catppuccin"
 vim.g.colorscheme_storage = vim.fn.stdpath("cache") .. "/last_colorscheme"
 vim.g.transparent = false
+vim.g.mapleader = " "
+vim.g.maplocalleader = "\\"
