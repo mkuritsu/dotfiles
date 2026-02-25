@@ -178,12 +178,12 @@
                 },
                 {
                     "deviceNativePath": "",
-                    "displayMode": "alwaysShow",
+                    "displayMode": "graphic",
                     "hideIfIdle": false,
                     "hideIfNotDetected": true,
                     "id": "Battery",
-                    "showNoctaliaPerformance": false,
-                    "showPowerProfiles": false
+                    "showNoctaliaPerformance": true,
+                    "showPowerProfiles": true
                 },
                 {
                     "displayMode": "onhover",
@@ -613,7 +613,7 @@
         "fontDefaultScale": 1,
         "fontFixed": "CaskaydiaMono Nerd Font",
         "fontFixedScale": 1,
-        "networkPanelView": "wifi",
+        "networkPanelView": "ethernet",
         "panelBackgroundOpacity": 1,
         "panelsAttachedToBar": true,
         "settingsPanelMode": "attached",
