@@ -4,7 +4,10 @@ return {
 	dependencies = { "rafamadriz/friendly-snippets" },
 	build = vim.fn.executable("nixos-rebuild") == 1 and "nix run .#build-plugin" or "cargo build --release",
 	opts = {
-		keymap = { preset = "enter" },
+		keymap = {
+			preset = "enter",
+			["<Tab>"] = { "accept", "fallback" },
+		},
 		appearance = {
 			nerd_font_variant = "mono",
 		},
