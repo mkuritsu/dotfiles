@@ -1,6 +1,6 @@
 spawn-sh-at-startup "systemctl start --user opentabletdriver"
 spawn-sh-at-startup "systemctl start --user hyprpolkitagent"
-spawn-sh-at-startup "systemctl start --user noctalia"
+spawn-sh-at-startup "qs -c noctalia-shell"
 spawn-sh-at-startup "systemctl start --user hypridle"
 
 input {
