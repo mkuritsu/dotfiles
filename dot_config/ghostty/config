@@ -1,4 +1,5 @@
 theme = "Catppuccin Mocha"
+background-opacity = 0.9
 font-family = "JetBrainsMonoNL Nerd Font"
 font-size = 11
 shell-integration-features = ssh-terminfo,ssh-env
