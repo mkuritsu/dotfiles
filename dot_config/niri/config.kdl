@@ -3,6 +3,21 @@ spawn-sh-at-startup "systemctl start --user hyprpolkitagent"
 spawn-sh-at-startup "qs -c noctalia-shell"
 spawn-sh-at-startup "systemctl start --user hypridle"
 
+environment {
+    XCURSOR_SIZE "24"
+    HYPRCURSOR_SIZE "24"
+    SDL_VIDEODRIVER "wayland"
+    ELECTRON_OZONE_PLATFORM_HINT "wayland"
+    QT_AUTO_SCREEN_SCALE_FACTOR "1"
+    QT_WAYLAND_DISABLE_WINDOWDECORATION "1"
+    QT_QPA_PLATFORM "wayland"
+    QT_QPA_PLATFORMTHEME "qt6ct"
+    APP2UNIT_SLICES "a=app-graphical.slice b=background-graphical.slice s=session-graphical.slice"
+    APP2UNIT_TYPE "service"
+    XDG_MENU_PREFIX "arch-"
+    EDITOR "nvim"
+}
+
 input {
     keyboard {
         xkb {
@@ -23,8 +38,17 @@ input {
     focus-follows-mouse max-scroll-amount="0%"
 }
 
+cursor {
+    xcursor-theme "macOS"
+    xcursor-size 24
+}
+
+clipboard {
+    disable-primary
+}
+
 output "DP-1" {
-    mode "1920x1080@144.001"
+    mode "1920x1080@120.000"
 }
 
 output "DP-2" {
