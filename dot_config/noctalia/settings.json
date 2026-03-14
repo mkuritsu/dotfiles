@@ -484,7 +484,7 @@
         "disableDiscoverability": false,
         "networkPanelView": "wifi",
         "wifiDetailsViewMode": "grid",
-        "wifiEnabled": false
+        "wifiEnabled": true
     },
     "nightLight": {
         "autoSchedule": true,
@@ -603,6 +603,13 @@
                 "command": "",
                 "countdownEnabled": true,
                 "enabled": true,
+                "keybind": "7"
+            },
+            {
+                "action": "userspaceReboot",
+                "command": "",
+                "countdownEnabled": true,
+                "enabled": false,
                 "keybind": ""
             }
         ],
@@ -634,7 +641,12 @@
         "warningColor": "#94e2d5"
     },
     "templates": {
-        "activeTemplates": [],
+        "activeTemplates": [
+            {
+                "enabled": true,
+                "id": "gtk"
+            }
+        ],
         "enableUserTheming": false
     },
     "ui": {
