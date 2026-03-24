@@ -32,6 +32,7 @@
         ],
         "preferredPlayer": "",
         "spectrumFrameRate": 30,
+        "spectrumMirrored": true,
         "visualizerType": "linear",
         "volumeFeedback": true,
         "volumeFeedbackSoundFile": "",
@@ -49,7 +50,6 @@
         "density": "default",
         "displayMode": "always_visible",
         "enableExclusionZoneInset": true,
-        "floating": false,
         "fontScale": 1,
         "frameRadius": 12,
         "frameThickness": 8,
@@ -340,7 +340,7 @@
         "deadOpacity": 0.6,
         "displayMode": "auto_hide",
         "dockType": "floating",
-        "enabled": false,
+        "enabled": true,
         "floatingRatio": 1,
         "groupApps": false,
         "groupClickAction": "cycle",
@@ -356,7 +356,7 @@
         "launcherUseDistroLogo": false,
         "monitors": [
         ],
-        "onlySameOutput": true,
+        "onlySameOutput": false,
         "pinnedApps": [
         ],
         "pinnedStatic": true,
@@ -479,8 +479,7 @@
         "bluetoothRssiPollingEnabled": false,
         "disableDiscoverability": false,
         "networkPanelView": "wifi",
-        "wifiDetailsViewMode": "grid",
-        "wifiEnabled": true
+        "wifiDetailsViewMode": "grid"
     },
     "nightLight": {
         "autoSchedule": true,
@@ -639,10 +638,6 @@
     },
     "templates": {
         "activeTemplates": [
-            {
-                "enabled": true,
-                "id": "gtk"
-            }
         ],
         "enableUserTheming": false
     },
@@ -697,6 +692,7 @@
         "transitionType": [
             "disc"
         ],
+        "useOriginalImages": false,
         "useSolidColor": false,
         "useWallhaven": false,
         "viewMode": "browse",
