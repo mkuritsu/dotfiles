@@ -11,6 +11,7 @@ vim.opt.swapfile = false
 vim.opt.clipboard = "unnamedplus"
 vim.opt.splitright = true
 vim.opt.cursorline = true
+vim.opt.termguicolors = true
 
 vim.diagnostic.enable = true
 vim.diagnostic.config({ virtual_text = true })

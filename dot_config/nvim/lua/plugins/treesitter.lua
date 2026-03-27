@@ -7,31 +7,6 @@ return {
 		config = function()
 			local ts = require("nvim-treesitter")
 			ts.install("all")
-			-- ts.install({
-			-- 	"rust",
-			-- 	"c",
-			-- 	"cpp",
-			-- 	"java",
-			-- 	"lua",
-			-- 	"python",
-			-- 	"javascript",
-			-- 	"typescript",
-			-- 	"css",
-			-- 	"html",
-			-- 	"sql",
-			-- 	"astro",
-			-- 	"nix",
-			-- 	"bash",
-			-- 	"fish",
-			-- 	"hyprlang",
-			-- 	"markdown",
-			-- 	"json",
-			-- 	"yaml",
-			-- 	"toml",
-			-- 	"kdl",
-			-- 	"latex",
-			-- 	"typst",
-			-- })
 		end,
 	},
 	{

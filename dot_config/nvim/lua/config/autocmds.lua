@@ -22,6 +22,13 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	end,
 })
 
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { '*' },
+  callback = function(args)
+      pcall(vim.treesitter.start, args.buf)
+  end,
+})
+
 vim.api.nvim_create_autocmd("ColorScheme", {
 	callback = function()
 		vim.fn.mkdir(vim.fn.stdpath("cache"), "p")
