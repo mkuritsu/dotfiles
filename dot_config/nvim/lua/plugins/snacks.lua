@@ -34,13 +34,5 @@ return {
 				Snacks.picker.grep()
 			end,
 		},
-		-- {
-		-- 	"<leader>e",
-		-- 	mode = "n",
-		-- 	desc = "Explorer",
-		-- 	function()
-		-- 		Snacks.explorer()
-		-- 	end,
-		-- },
 	},
 }

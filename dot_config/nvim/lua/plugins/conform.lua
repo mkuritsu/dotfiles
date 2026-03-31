@@ -1,4 +1,4 @@
-local js_formatters = { "biome", "prettierd", "prettier", stop_after_first = true }
+local js_formatters = { "oxfmt", "biome", "prettierd", "prettier", stop_after_first = true }
 
 return {
 	"stevearc/conform.nvim",
@@ -21,6 +21,7 @@ return {
 			javascript = js_formatters,
 			javascriptreact = js_formatters,
 			astro = js_formatters,
+			json = js_formatters,
 			cpp = { "clang-format" },
 			c = { "clang-format" },
 			lua = { "stylua" },
