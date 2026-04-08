@@ -12,6 +12,8 @@ end
 fish_add_path "$HOME/.local/bin"
 fish_add_path "$HOME/.cache/.bun/bin"
 
+set -x EDITOR nvim
+
 if type -q zeditor
     alias zed=zeditor
 end
