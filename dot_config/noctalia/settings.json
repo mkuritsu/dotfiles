@@ -18,9 +18,8 @@
         "ignoreMouseInput": false,
         "overviewLayer": false,
         "pinnedApps": [
-            "Alacritty"
         ],
-        "position": "center",
+        "position": "bottom_center",
         "screenshotAnnotationTool": "",
         "showCategories": false,
         "showIconBackground": false,
@@ -356,7 +355,7 @@
         "dockType": "floating",
         "enabled": true,
         "floatingRatio": 0,
-        "groupApps": false,
+        "groupApps": true,
         "groupClickAction": "cycle",
         "groupContextMenuMode": "extended",
         "groupIndicatorStyle": "dots",
@@ -372,11 +371,18 @@
         ],
         "onlySameOutput": false,
         "pinnedApps": [
+            "org.gnome.Nautilus",
+            "helium",
+            "com.mitchellh.ghostty",
+            "discord",
+            "com.spotify.Client",
+            "code",
+            "zen"
         ],
-        "pinnedStatic": false,
+        "pinnedStatic": true,
         "position": "bottom",
         "showDockIndicator": false,
-        "showLauncherIcon": true,
+        "showLauncherIcon": false,
         "sitOnFrame": false,
         "size": 1.5
     },
