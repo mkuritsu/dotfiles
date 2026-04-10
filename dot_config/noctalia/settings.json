@@ -71,7 +71,7 @@
         "rightClickFollowMouse": true,
         "screenOverrides": [
         ],
-        "showCapsule": true,
+        "showCapsule": false,
         "showOnWorkspaceSwitch": true,
         "showOutline": false,
         "useSeparateOpacity": false,
@@ -122,6 +122,12 @@
                     "textColor": "none",
                     "useMonospaceFont": true,
                     "usePadding": false
+                },
+                {
+                    "colorName": "none",
+                    "hideWhenIdle": false,
+                    "id": "AudioVisualizer",
+                    "width": 200
                 }
             ],
             "right": [
@@ -261,6 +267,7 @@
         "monitorForColors": "",
         "predefinedScheme": "Monochrome",
         "schedulingMode": "off",
+        "syncGsettings": true,
         "useWallpaperColors": false
     },
     "controlCenter": {
@@ -340,7 +347,7 @@
         "deadOpacity": 0.6,
         "displayMode": "auto_hide",
         "dockType": "floating",
-        "enabled": false,
+        "enabled": true,
         "floatingRatio": 1,
         "groupApps": false,
         "groupClickAction": "cycle",
@@ -428,6 +435,7 @@
         "showHibernateOnLockScreen": false,
         "showScreenCorners": false,
         "showSessionButtonsOnLockScreen": true,
+        "smoothScrollEnabled": true,
         "telemetryEnabled": false
     },
     "hooks": {
@@ -458,6 +466,7 @@
     },
     "location": {
         "analogClockInCalendar": false,
+        "autoLocate": false,
         "firstDayOfWeek": -1,
         "hideWeatherCityName": false,
         "hideWeatherTimezone": false,
@@ -468,10 +477,10 @@
         "use12hourFormat": false,
         "useFahrenheit": false,
         "weatherEnabled": true,
-        "weatherShowEffects": true
+        "weatherShowEffects": true,
+        "weatherTaliaMascotAlways": false
     },
     "network": {
-        "airplaneModeEnabled": false,
         "bluetoothAutoConnect": true,
         "bluetoothDetailsViewMode": "grid",
         "bluetoothHideUnnamedDevices": false,
@@ -645,7 +654,7 @@
         "boxBorderEnabled": false,
         "fontDefault": "Adwaita Sans",
         "fontDefaultScale": 1,
-        "fontFixed": "JetBrainsMonoNL NF",
+        "fontFixed": "Adwaita Mono",
         "fontFixedScale": 1,
         "panelBackgroundOpacity": 1,
         "panelsAttachedToBar": true,
@@ -665,6 +674,7 @@
         "fillColor": "#000000",
         "fillMode": "crop",
         "hideWallpaperFilenames": false,
+        "linkLightAndDarkWallpapers": true,
         "monitorDirectories": [
             {
                 "directory": "/home/kuritsu/Pictures/Wallpapers",

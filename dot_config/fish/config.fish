@@ -22,3 +22,4 @@ bind ctrl-f cd_fzf
 
 starship init fish | source
 
+eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv fish)"
