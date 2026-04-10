@@ -1,4 +1,9 @@
 spawn-sh-at-startup "qs -c noctalia-shell"
+spawn-sh-at-startup "vicinae server"
+
+environment {
+    ELECTRON_OZONE_PLATFORM_HINT "wayland"
+}
 
 cursor {
     xcursor-theme "macOS"
@@ -93,11 +98,17 @@ window-rule {
     clip-to-geometry true
 }
 
+window-rule {
+    match app-id="chrome-nngceckbapebfimnlniiiahkandclblb-Default"
+    block-out-from "screen-capture"
+    open-floating true
+}
+
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty"; }
+    Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty" "+new-window"; }
     Mod+Space hotkey-overlay-title="Run an Application: vicinae" { spawn-sh "vicinae toggle"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn-sh "qs -c noctalia-shell ipc call lockScreen lock"; }
 
