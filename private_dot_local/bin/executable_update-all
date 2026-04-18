@@ -62,6 +62,10 @@ if has vp; then
   run_step "vite-plus update packages" vp update -g
 fi
 
+if has bun; then
+    run_step "bun upgrade" bun upgrade
+fi
+
 if has pi; then
     run_step "pi update" pi update
 fi

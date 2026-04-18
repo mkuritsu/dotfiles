@@ -13,12 +13,16 @@ bind ctrl-f cd_fzf
 fish_add_path "$HOME/.local/bin"
 fish_add_path "$HOME/.cache/.bun/bin"
 
-starship init fish | source
-zoxide init fish | source
+# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv fish)"
 
-eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv fish)"
+if type -q starship
+    starship init fish | source
+end
 
-set -x EDITOR $(which nvim)
+if type -q zoxide
+    zoxide init fish | source
+    alias cd="z"
+end
 
 if type -q zeditor
     alias zed="zeditor"
@@ -28,6 +32,11 @@ if type -q eza
     alias ls="eza"
 end
 
-alias cd="z"
 alias oc="opencode"
 
+set -x EDITOR $(which nvim)
+
+
+# bun
+set --export BUN_INSTALL "$HOME/.bun"
+set --export PATH $BUN_INSTALL/bin $PATH
