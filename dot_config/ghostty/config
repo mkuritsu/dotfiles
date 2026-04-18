@@ -10,3 +10,4 @@ resize-overlay = never
 title = "Ghostty"
 
 gtk-custom-css = ./style.css
+quit-after-last-window-closed = false

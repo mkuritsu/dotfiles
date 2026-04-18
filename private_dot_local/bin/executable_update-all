@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+set -u
+
+if [[ -t 1 ]]; then
+  RED=$'\033[31m'
+  GREEN=$'\033[32m'
+  YELLOW=$'\033[33m'
+  CYAN=$'\033[36m'
+  RESET=$'\033[0m'
+else
+  RED=''
+  GREEN=''
+  YELLOW=''
+  CYAN=''
+  RESET=''
+fi
+
+has() {
+  command -v "$1" >/dev/null 2>&1
+}
+
+run_step() {
+  local label="$1"
+  local code=0
+  shift
+
+  RAN_ANY=1
+  printf '\n%b==> %s%b\n' "$CYAN" "$label" "$RESET"
+
+  if "$@"; then
+    printf '%b [OK]%b %s\n' "$GREEN" "$RESET" "$label"
+    STEP_LABELS+=("$label")
+    STEP_STATUS+=("success")
+  else
+    code=$?
+    printf '%b [FAIL]%b %s (exit %d)\n' "$RED" "$RESET" "$label" "$code"
+    HAS_FAILURE=1
+    STEP_LABELS+=("$label")
+    STEP_STATUS+=("failed:$code")
+  fi
+}
+
+RAN_ANY=0
+HAS_FAILURE=0
+STEP_LABELS=()
+STEP_STATUS=()
+
+if has paru; then
+  run_step "paru -Syu" paru -Syu --noconfirm
+fi
+
+if has flatpak; then
+  run_step "flatpak update" flatpak update -y
+fi
+
+if has rustup; then
+  run_step "rustup update" rustup update
+fi
+
+if has vp; then
+  run_step "vite-plus upgrade" vp upgrade
+  run_step "vite-plus update packages" vp update -g
+fi
+
+if has pi; then
+    run_step "pi update" pi update
+fi
+
+if [[ "$RAN_ANY" -eq 0 ]]; then
+  printf 'No known update tools found on this system.\n'
+  exit 0
+fi
+
+printf '\n%b Script completed. Ran steps:%b\n' "$YELLOW" "$RESET"
+for i in "${!STEP_LABELS[@]}"; do
+  label="${STEP_LABELS[$i]}"
+  status="${STEP_STATUS[$i]}"
+
+  if [[ "$status" == "success" ]]; then
+    printf '  %b%b %s\n' "$GREEN" "$RESET" "$label"
+  else
+    code="${status#failed:}"
+    printf '  %b%b %s (exit %s)\n' "$RED" "$RESET" "$label" "$code"
+  fi
+done
+
+if [[ "$HAS_FAILURE" -ne 0 ]]; then
+  exit 1
+fi

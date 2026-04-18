@@ -1,5 +1,6 @@
 spawn-sh-at-startup "qs -c noctalia-shell"
 spawn-sh-at-startup "vicinae server"
+prefer-no-csd
 
 environment {
     ELECTRON_OZONE_PLATFORM_HINT "wayland"
@@ -31,13 +32,13 @@ input {
 output "HDMI-A-1" {
     mode "1920x1080@120.000"
     scale 1
-    position x=0 y=0
+    position x=1920 y=0
 }
 
 output "eDP-1" {
     mode "1920x1200@59.999"
     scale 1
-    position x=0 y=1080
+    position x=0 y=0
 }
 
 layout {
@@ -315,7 +316,6 @@ binds {
 
     // Move the focused window between the floating and the tiling layout.
     Mod+V       { toggle-window-floating; }
-    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
 
     // Toggle tabbed column display mode.
     // Windows in this column will appear as vertical tabs,

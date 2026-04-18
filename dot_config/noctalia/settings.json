@@ -19,7 +19,7 @@
         "overviewLayer": false,
         "pinnedApps": [
         ],
-        "position": "bottom_center",
+        "position": "center",
         "screenshotAnnotationTool": "",
         "showCategories": false,
         "showIconBackground": false,
@@ -167,18 +167,6 @@
                     "id": "plugin:screen-recorder"
                 },
                 {
-                    "defaultSettings": {
-                        "activeColor": "primary",
-                        "enableToast": true,
-                        "hideInactive": false,
-                        "iconSpacing": 4,
-                        "inactiveColor": "none",
-                        "micFilterRegex": "",
-                        "removeMargins": false
-                    },
-                    "id": "plugin:privacy-indicator"
-                },
-                {
                     "hideWhenZero": false,
                     "hideWhenZeroUnread": false,
                     "iconColor": "none",
@@ -233,11 +221,12 @@
                 {
                     "colorizeDistroLogo": false,
                     "colorizeSystemIcon": "primary",
+                    "colorizeSystemText": "none",
                     "customIconPath": "",
                     "enableColorization": true,
-                    "icon": "sparkles",
+                    "icon": "noctalia",
                     "id": "ControlCenter",
-                    "useDistroLogo": false
+                    "useDistroLogo": true
                 }
             ]
         }
@@ -274,7 +263,7 @@
         "predefinedScheme": "Monochrome",
         "schedulingMode": "off",
         "syncGsettings": true,
-        "useWallpaperColors": false
+        "useWallpaperColors": true
     },
     "controlCenter": {
         "cards": [
@@ -291,7 +280,7 @@
                 "id": "audio-card"
             },
             {
-                "enabled": false,
+                "enabled": true,
                 "id": "brightness-card"
             },
             {
@@ -342,6 +331,11 @@
                 "name": "DP-1",
                 "widgets": [
                 ]
+            },
+            {
+                "name": "HDMI-A-1",
+                "widgets": [
+                ]
             }
         ],
         "overviewEnabled": true
@@ -382,7 +376,7 @@
         "pinnedStatic": true,
         "position": "bottom",
         "showDockIndicator": false,
-        "showLauncherIcon": false,
+        "showLauncherIcon": true,
         "sitOnFrame": false,
         "size": 1.5
     },
@@ -494,7 +488,7 @@
         "weatherTaliaMascotAlways": false
     },
     "network": {
-        "bluetoothAutoConnect": true,
+        "bluetoothAutoConnect": false,
         "bluetoothDetailsViewMode": "grid",
         "bluetoothHideUnnamedDevices": false,
         "bluetoothRssiPollIntervalMs": 10000,
@@ -514,7 +508,7 @@
     },
     "noctaliaPerformance": {
         "disableDesktopWidgets": true,
-        "disableWallpaper": true
+        "disableWallpaper": false
     },
     "notifications": {
         "backgroundOpacity": 1,
@@ -660,6 +654,10 @@
     },
     "templates": {
         "activeTemplates": [
+            {
+                "enabled": true,
+                "id": "gtk"
+            }
         ],
         "enableUserTheming": false
     },
