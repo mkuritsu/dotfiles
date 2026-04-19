@@ -2,7 +2,14 @@ function fish_greeting
 end
 
 function cd_fzf
-    set dir $(find ~/ ~/Dev . -mindepth 1 -maxdepth 1 -type d -o -type l | fzf)
+    set lookup_dirs ~/ .
+    if test -d ~/Dev
+        set lookup_dirs $lookup_dirs ~/Dev
+    end
+    if test -d ~/Projects
+        set lookup_dirs $lookup_dirs ~/Projects/
+    end
+    set dir $(find $lookup_dirs -mindepth 1 -maxdepth 1 -type d -o -type l | fzf)
     if test -n "$dir"
         cd $dir
         commandline -f repaint
@@ -36,3 +43,5 @@ alias oc="opencode"
 set -x EDITOR $(which nvim)
 set -x GOPATH "$HOME/.go"
 set --export BUN_INSTALL "$HOME/.bun"
+
+source "$HOME/.vite-plus/env.fish"
