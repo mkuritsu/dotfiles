@@ -360,7 +360,7 @@
         "deadOpacity": 0.6,
         "displayMode": "auto_hide",
         "dockType": "floating",
-        "enabled": true,
+        "enabled": false,
         "floatingRatio": 0,
         "groupApps": true,
         "groupClickAction": "cycle",
@@ -378,13 +378,8 @@
         ],
         "onlySameOutput": false,
         "pinnedApps": [
-            "org.gnome.Nautilus",
-            "helium",
-            "com.mitchellh.ghostty",
             "discord",
-            "com.spotify.Client",
-            "code",
-            "zen"
+            "com.discordapp.Discord"
         ],
         "pinnedStatic": true,
         "position": "bottom",

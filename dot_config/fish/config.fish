@@ -35,8 +35,6 @@ end
 alias oc="opencode"
 
 set -x EDITOR $(which nvim)
-
-
-# bun
+set -x GOPATH "$HOME/.go"
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
