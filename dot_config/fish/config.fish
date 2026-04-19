@@ -12,8 +12,7 @@ bind ctrl-f cd_fzf
 
 fish_add_path "$HOME/.local/bin"
 fish_add_path "$HOME/.cache/.bun/bin"
-
-# eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv fish)"
+fish_add_path "$HOME/.bun/bin"
 
 if type -q starship
     starship init fish | source
@@ -37,4 +36,3 @@ alias oc="opencode"
 set -x EDITOR $(which nvim)
 set -x GOPATH "$HOME/.go"
 set --export BUN_INSTALL "$HOME/.bun"
-set --export PATH $BUN_INSTALL/bin $PATH

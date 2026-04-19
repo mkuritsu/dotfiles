@@ -7,7 +7,7 @@ environment {
 }
 
 cursor {
-    xcursor-theme "macOS"
+    xcursor-theme "Adwaita"
     xcursor-size 24
 }
 
@@ -21,7 +21,7 @@ input {
     touchpad {
         tap
         natural-scroll
-        scroll-factor 0.3
+        scroll-factor 1.0
     }
 
     mouse {
