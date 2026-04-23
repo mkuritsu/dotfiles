@@ -1,8 +1,14 @@
 return {
 	"saghen/blink.cmp",
+	version = "1.*",
 	event = "InsertEnter",
 	dependencies = { "rafamadriz/friendly-snippets" },
-	build = vim.fn.executable("nixos-rebuild") == 1 and "nix run .#build-plugin" or "cargo build --release",
+	-- build = function()
+	-- 	require("blink.cmp").build():wait(60000)
+	-- end,
+
+	---@module 'blink.cmp'
+	---@type blink.cmp.Config
 	opts = {
 		keymap = {
 			preset = "enter",
