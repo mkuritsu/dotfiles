@@ -122,12 +122,6 @@
                     "textColor": "none",
                     "useMonospaceFont": true,
                     "usePadding": false
-                },
-                {
-                    "colorName": "none",
-                    "hideWhenIdle": false,
-                    "id": "AudioVisualizer",
-                    "width": 200
                 }
             ],
             "right": [
@@ -400,7 +394,7 @@
         "clockStyle": "custom",
         "compactLockScreen": false,
         "dimmerOpacity": 0.2,
-        "enableBlurBehind": true,
+        "enableBlurBehind": false,
         "enableLockScreenCountdown": true,
         "enableLockScreenMediaControls": false,
         "enableShadows": false,

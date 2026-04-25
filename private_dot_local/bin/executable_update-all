@@ -45,8 +45,12 @@ HAS_FAILURE=0
 STEP_LABELS=()
 STEP_STATUS=()
 
+if has pacman; then
+    run_step "pacman -Syu" sudo pacman -Syu --noconfirm
+fi
+
 if has paru; then
-  run_step "paru -Syu" paru -Syu --noconfirm
+  run_step "paru -Syu" paru -Syu
 fi
 
 if has flatpak; then
