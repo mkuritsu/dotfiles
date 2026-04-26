@@ -28,6 +28,8 @@ input {
     }
 }
 
+// Laptop
+
 output "HDMI-A-1" {
     mode "1920x1080@120.000"
     scale 1
@@ -36,6 +38,19 @@ output "HDMI-A-1" {
 
 output "eDP-1" {
     mode "1920x1200@59.999"
+    scale 1
+    position x=0 y=0
+}
+
+// Desktop monitors
+output "DP-1" {
+    mode "1920x1080@120"
+    scale 1
+    position x=1920 y=0
+}
+
+output "DP-2" {
+    mode "1920x1080@60"
     scale 1
     position x=0 y=0
 }
