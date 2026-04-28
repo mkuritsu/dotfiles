@@ -1,4 +1,5 @@
 spawn-sh-at-startup "qs -c noctalia-shell"
+spawn-sh-at-startup "systemctl start --user hyprpolkitagent"
 prefer-no-csd
 
 environment {
@@ -13,6 +14,8 @@ cursor {
 input {
     keyboard {
         xkb {
+            layout "us"
+            variant "altgr-intl"
         }
         numlock
     }
