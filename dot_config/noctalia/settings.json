@@ -341,7 +341,7 @@
         "deadOpacity": 0.6,
         "displayMode": "auto_hide",
         "dockType": "floating",
-        "enabled": false,
+        "enabled": true,
         "floatingRatio": 0,
         "groupApps": true,
         "groupClickAction": "cycle",
@@ -359,8 +359,9 @@
         ],
         "onlySameOutput": false,
         "pinnedApps": [
-            "discord",
-            "com.discordapp.Discord"
+            "com.mitchellh.ghostty",
+            "helium",
+            "com.spotify.Client"
         ],
         "pinnedStatic": true,
         "position": "bottom",
@@ -448,7 +449,7 @@
     },
     "idle": {
         "customCommands": "[]",
-        "enabled": true,
+        "enabled": false,
         "fadeDuration": 5,
         "lockCommand": "",
         "lockTimeout": 660,

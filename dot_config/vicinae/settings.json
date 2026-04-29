@@ -12,7 +12,7 @@
   "$schema": "https://vicinae.com/schemas/config.json",
   "launcher_window": {
     "layer_shell": {
-      "enabled": false
+      "enabled": true
     }
   }
 }
