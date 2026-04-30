@@ -2,6 +2,7 @@ return {
 	"stevearc/oil.nvim",
 	lazy = false,
 	opts = {
+		default_file_explorer = false,
 		float = {
 			border = "rounded",
 			padding = 2,
