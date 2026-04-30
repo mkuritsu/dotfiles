@@ -1,3 +1,6 @@
+##############
+# Functions
+##############
 function fish_greeting
 end
 
@@ -17,9 +20,22 @@ function cd_fzf
 end
 bind ctrl-f cd_fzf
 
+##############
+# Path
+##############
 fish_add_path "$HOME/.local/bin"
 fish_add_path "$HOME/.cache/.bun/bin"
 fish_add_path "$HOME/.bun/bin"
+
+set -x GOPATH "$HOME/.go" # so go does not polute my home dir
+set -x BUN_INSTALL "$HOME/.bun"
+
+##############
+# Source
+##############
+if test -f "$HOME/.vite-plus/env.fish"
+    source "$HOME/.vite-plus/env.fish"
+end
 
 if type -q starship
     starship init fish | source
@@ -30,6 +46,9 @@ if type -q zoxide
     alias cd="z"
 end
 
+##############
+# ALIASES
+##############
 if type -q zeditor
     alias zed="zeditor"
 end
@@ -38,10 +57,3 @@ if type -q eza
     alias ls="eza"
 end
 
-alias oc="opencode"
-
-set -x EDITOR $(which nvim)
-set -x GOPATH "$HOME/.go"
-set --export BUN_INSTALL "$HOME/.bun"
-
-source "$HOME/.vite-plus/env.fish"
