@@ -3,7 +3,7 @@ vim.keymap.set("i", "<C-j>", "<down>")
 vim.keymap.set("i", "<C-k>", "<up>")
 vim.keymap.set("i", "<C-l>", "<right>")
 
-vim.keymap.set("n", "<leader>q", ":bd<CR>", { desc = "Close buffer" })
+vim.keymap.set("n", "<C-q>", ":bd<CR>", { desc = "Close buffer" })
 
 vim.keymap.set("n", "<leader>-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
 vim.keymap.set("n", "<C-l>", "<CMD>edit!<CR>", { desc = "Reload buffer from disk" })
