@@ -10,7 +10,16 @@
 
 {
   "$schema": "https://vicinae.com/schemas/config.json",
+  "theme": {
+    "dark": {
+      "name": "vicinae-dark"
+    }
+  },
   "launcher_window": {
+    "opacity": 0.75,
+    "blur": {
+      "enabled": true
+    },
     "layer_shell": {
       "enabled": true
     }
