@@ -1,7 +1,7 @@
 "$schema" = 'https://starship.rs/config-schema.json'
 
 add_newline = false
-format = '$username$directory$git_branch$nix_shell$container$python$character'
+format = '$username$directory$git_branch$nix_shell$container$character'
 line_break = false
 
 [character]
@@ -26,7 +26,3 @@ symbol = "❄️"
 [fill]
 symbol = " "
 
-[python]
-format = "[\\(venv\\)](blue) "
-detect_extensions = []
-detect_folders = []
