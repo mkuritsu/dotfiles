@@ -18,7 +18,6 @@ return {
 				"tailwindcss",
 				"basedpyright",
 				"jdtls",
-				"nil_ls",
 				"astro",
 				"bashls",
 				"cssls",

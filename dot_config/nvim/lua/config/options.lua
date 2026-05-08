@@ -17,8 +17,6 @@ vim.diagnostic.enable = true
 vim.diagnostic.config({ virtual_text = true })
 
 vim.g.editorconfig = true
-vim.g.default_colorscheme = "catppuccin"
 vim.g.colorscheme_storage = vim.fn.stdpath("cache") .. "/last_colorscheme"
-vim.g.transparent = false
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"

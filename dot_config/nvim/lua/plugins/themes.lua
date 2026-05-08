@@ -1,3 +1,5 @@
+local transparent = true
+
 return {
 	{
 		"catppuccin/nvim",
@@ -6,8 +8,20 @@ return {
 		priority = 1000,
 		opts = {
 			flavour = "mocha",
-			transparent_background = vim.g.transparent,
+			transparent_background = transparent,
 			no_italic = true,
+			auto_integrations = true,
+			custom_highlights = function(colors)
+				return {
+					CursorLine = {
+						bg = "NONE",
+					},
+					CursorLineNr = {
+						fg = colors.mauve,
+						bold = true,
+					},
+				}
+			end,
 		},
 	},
 	{
@@ -18,7 +32,7 @@ return {
 		opts = {
 			variant = "main",
 			dim_inactive_windows = true,
-			styles = { italic = false, transparency = vim.g.transparent },
+			styles = { italic = false, transparency = transparent },
 		},
 	},
 	{
@@ -28,7 +42,7 @@ return {
 		priority = 1000,
 		opts = {
 			options = {
-				transparent = vim.g.transparent,
+				transparent = transparent,
 			},
 		},
 	},
@@ -37,7 +51,7 @@ return {
 		lazy = false,
 		priority = 1000,
 		opts = {
-			transparent = vim.g.transparent,
+			transparent = transparent,
 		},
 	},
 }

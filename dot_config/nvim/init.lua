@@ -3,7 +3,7 @@ require("config.lazy")
 require("config.keymaps")
 require("config.autocmds")
 
-local colorscheme = vim.g.default_colorscheme
+local colorscheme = "catppuccin"
 if vim.fn.filereadable(vim.g.colorscheme_storage) == 1 then
 	colorscheme = vim.fn.readfile(vim.g.colorscheme_storage)[1]
 end

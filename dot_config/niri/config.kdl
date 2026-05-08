@@ -1,4 +1,5 @@
-spawn-sh-at-startup "~/.local/bin/exec-desktop-shell.sh"
+// spawn-sh-at-startup "~/.local/bin/exec-desktop-shell.sh"
+spawn-sh-at-startup "dms run"
 spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "systemctl start --user hyprpolkitagent"
 prefer-no-csd
@@ -115,6 +116,41 @@ window-rule {
 window-rule {
     geometry-corner-radius 12
     clip-to-geometry true
+    draw-border-with-background false
+    background-effect {
+        xray false
+    }
+}
+
+// Blur the background behind pop-up menus in Nautilus.
+window-rule {
+    match app-id="Nautilus"
+
+    background-effect {
+        blur true
+    }
+
+    popups {
+        geometry-corner-radius 15
+        background-effect {
+            blur true
+        }
+    }
+}
+
+window-rule {
+    match app-id="^com.mitchellh.ghostty$"
+
+    background-effect {
+        blur true
+        xray false
+    }
+}
+
+layer-rule {
+    background-effect {
+        xray false
+    }
 }
 
 window-rule {
@@ -126,10 +162,10 @@ window-rule {
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
-    Mod+T hotkey-overlay-title="Open a Terminal: ghostty" { spawn "ghostty" "+new-window"; }
+    Mod+T hotkey-overlay-title="Open a Terminal" { spawn "ghostty" "+new-window"; }
     Mod+Space hotkey-overlay-title="Run an Application" { spawn "vicinae" "toggle"; }
     Mod+E { spawn "nautilus"; }
-    Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn-sh "~/.local/bin/exec-desktop-shell.sh ipc call lockScreen lock"; }
+    Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn-sh "loginctl lock-session"; }
 
     XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0"; }
     XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-"; }
