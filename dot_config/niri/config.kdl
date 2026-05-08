@@ -1,7 +1,6 @@
-// spawn-sh-at-startup "~/.local/bin/exec-desktop-shell.sh"
-spawn-sh-at-startup "dms run"
 spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "systemctl start --user hyprpolkitagent"
+spawn-sh-at-startup "systemctl start --user dms"
 prefer-no-csd
 
 environment {
