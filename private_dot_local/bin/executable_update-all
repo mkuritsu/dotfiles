@@ -67,7 +67,10 @@ if has vp; then
 fi
 
 if has bun; then
-    run_step "bun upgrade" bun upgrade
+    bun_path=$(command -v bun)
+    if [[ "$bun_path" != "/usr/bin/bun" ]]; then
+        run_step "bun upgrade" bun upgrade
+    fi
 fi
 
 if has pi; then
