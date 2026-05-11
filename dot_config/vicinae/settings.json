@@ -21,7 +21,8 @@
       "enabled": true
     },
     "layer_shell": {
-      "enabled": true
+      "enabled": true,
+      "layer": "overlay"
     }
   }
 }
