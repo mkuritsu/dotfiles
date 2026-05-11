@@ -1,0 +1,39 @@
+-- WINDOWRULES
+hl.window_rule({
+	name = "suppress-maximize-events",
+	match = {
+		class = ".*",
+	},
+	suppress_event = "maximize",
+})
+
+hl.window_rule({
+	name = "bitwarden",
+	match = {
+		class = "chrome-nngceckbapebfimnlniiiahkandclblb-Default",
+	},
+	float = true,
+	no_screen_share = true,
+})
+
+hl.window_rule({
+	name = "fix-xwayland-drags",
+	match = {
+		class = "^$",
+		title = "^$",
+		xwayland = true,
+		float = true,
+		fullscreen = false,
+		pin = false,
+	},
+	no_focus = true,
+})
+
+-- LAYERRULES
+hl.layer_rule({
+	name = "vicinae-blur",
+	match = {
+		namespace = "vicinae",
+	},
+	blur = true,
+})

@@ -1,0 +1,7 @@
+require("animations")
+require("autostart")
+require("bindings")
+require("config")
+require("input")
+require("monitors")
+require("rules")

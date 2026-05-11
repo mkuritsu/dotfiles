@@ -1,0 +1,6 @@
+hl.on("hyprland.start", function()
+	hl.exec_cmd("systemctl start --user dms")
+	hl.exec_cmd("systemctl start --user opentabletdriver")
+	hl.exec_cmd("systemctl start --user vicinae")
+	hl.exec_cmd("systemctl start --user hyprpolkitagent")
+end)
