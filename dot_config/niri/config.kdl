@@ -32,20 +32,6 @@ input {
     }
 }
 
-// Laptop
-
-output "HDMI-A-1" {
-    mode "1920x1080@120.000"
-    scale 1
-    position x=1920 y=0
-}
-
-output "eDP-1" {
-    mode "1920x1200@59.999"
-    scale 1
-    position x=0 y=0
-}
-
 // Desktop monitors
 output "DP-1" {
     mode "1920x1080@120"
@@ -59,8 +45,21 @@ output "DP-2" {
     position x=0 y=0
 }
 
+// Laptop monitors
+output "HDMI-A-1" {
+    mode "1920x1080@120.000"
+    scale 1
+    position x=1920 y=0
+}
+
+output "eDP-1" {
+    mode "1920x1200@59.999"
+    scale 1
+    position x=0 y=0
+}
+
 layout {
-    gaps 16
+    gaps 12
     center-focused-column "never"
     preset-column-widths {
         proportion 0.33333
@@ -327,36 +326,21 @@ binds {
 
     // Consume one window from the right to the bottom of the focused column.
     Mod+Comma  { consume-window-into-column; }
-    // Expel the bottom window from the focused column to the right.
     Mod+Period { expel-window-from-column; }
 
     Mod+R { switch-preset-column-width; }
-    // Cycling through the presets in reverse order is also possible.
-    // Mod+R { switch-preset-column-width-back; }
-    Mod+Shift+R { switch-preset-window-height; }
-    Mod+Ctrl+R { reset-window-height; }
+    Mod+Shift+R { switch-preset-column-width-back; }
+
     Mod+F { fullscreen-window; }
     Mod+Shift+F { maximize-column; }
 
-    // Expand the focused column to space not taken up by other fully visible columns.
-    // Makes the column "fill the rest of the space".
     Mod+Ctrl+F { expand-column-to-available-width; }
 
     Mod+M { maximize-window-to-edges; }
 
     Mod+C { center-column; }
-
-    // Center all fully visible columns on screen.
     Mod+Ctrl+C { center-visible-columns; }
 
-    // Finer width adjustments.
-    // This command can also:
-    // * set width in pixels: "1000"
-    // * adjust width in pixels: "-5" or "+5"
-    // * set width as a percentage of screen width: "25%"
-    // * adjust width as a percentage of screen width: "-10%" or "+10%"
-    // Pixel sizes use logical, or scaled, pixels. I.e. on an output with scale 2.0,
-    // set-column-width "100" will make the column occupy 200 physical screen pixels.
     Mod+Minus { set-column-width "-10%"; }
     Mod+Equal { set-column-width "+10%"; }
 
@@ -366,11 +350,12 @@ binds {
 
     // Move the focused window between the floating and the tiling layout.
     Mod+V       { toggle-window-floating; }
+    Mod+Shift+V { switch-focus-between-floating-and-tiling; }
 
     // Toggle tabbed column display mode.
     // Windows in this column will appear as vertical tabs,
     // rather than stacked on top of each other.
-    Mod+W { toggle-column-tabbed-display; }
+    // Mod+W { toggle-column-tabbed-display; }
 
     // Actions to switch layouts.
     // Note: if you uncomment these, make sure you do NOT have
