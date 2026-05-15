@@ -26,6 +26,7 @@ bind ctrl-f cd_fzf
 fish_add_path "$HOME/.local/bin"
 fish_add_path "$HOME/.cache/.bun/bin"
 fish_add_path "$HOME/.bun/bin"
+fish_add_path "$HOME/.nix-profile/bin"
 
 set -x GOPATH "$HOME/.go" # so go does not polute my home dir
 set -x BUN_INSTALL "$HOME/.bun"

@@ -1,6 +1,7 @@
-spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "systemctl start --user hyprpolkitagent"
 spawn-sh-at-startup "systemctl start --user dms"
+spawn-sh-at-startup "systemctl start --user opentabletdriver"
+spawn-sh-at-startup "systemctl start --user vicinae"
 // prefer-no-csd
 
 environment {

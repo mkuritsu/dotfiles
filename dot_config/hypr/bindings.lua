@@ -1,6 +1,8 @@
 local mainMod = "SUPER"
 
-local terminal = "ghostty +new-window"
+-- local terminal = "ghostty +new-window"
+-- local terminal = "foot"
+local terminal = "ghostty"
 local fileManager = "nautilus"
 local launcher = "vicinae toggle"
 local lockScreen = "loginctl lock-session"
@@ -23,26 +25,10 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + M", hl.dsp.window.fullscreen({ mode = "maximized" }))
 
 -- MEDIA
-hl.bind(
-	"XF86AudioRaiseVolume",
-	hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"),
-	{ locked = true, repeating = true }
-)
-hl.bind(
-	"XF86AudioLowerVolume",
-	hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"),
-	{ locked = true, repeating = true }
-)
-hl.bind(
-	"XF86AudioMute",
-	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"),
-	{ locked = true, repeating = true }
-)
-hl.bind(
-	"XF86AudioMicMute",
-	hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"),
-	{ locked = true, repeating = true }
-)
+hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
+hl.bind("XF86AudioLowerVolume", hl.dsp.exec_cmd("wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"), { locked = true, repeating = true })
+hl.bind("XF86AudioMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"), { locked = true, repeating = true })
+hl.bind("XF86AudioMicMute", hl.dsp.exec_cmd("wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessUp", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%+"), { locked = true, repeating = true })
 hl.bind("XF86MonBrightnessDown", hl.dsp.exec_cmd("brightnessctl -e4 -n2 set 5%-"), { locked = true, repeating = true })
 hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), { locked = true })
@@ -78,15 +64,19 @@ local focus_binds = {
 for dir, binds in pairs(focus_binds) do
 	for _, bind in ipairs(binds) do
 		hl.bind(mainMod .. " + " .. bind, hl.dsp.focus({ direction = dir }))
-		hl.bind(mainMod .. " + SHIFT + " .. bind, hl.dsp.window.swap({ direction = dir }))
+		hl.bind(mainMod .. " + SHIFT + " .. bind, hl.dsp.window.move({ direction = dir }))
 	end
 end
 
 hl.bind(mainMod .. " + CONTROL + left", hl.dsp.focus({ workspace = "r-1" }))
 hl.bind(mainMod .. " + CONTROL + right", hl.dsp.focus({ workspace = "r+1" }))
+hl.bind(mainMod .. " + CONTROL + h", hl.dsp.focus({ workspace = "r-1" }))
+hl.bind(mainMod .. " + CONTROL + l", hl.dsp.focus({ workspace = "r+1" }))
 
 hl.bind(mainMod .. " + SHIFT + CONTROL + left", hl.dsp.window.move({ workspace = "r-1" }))
 hl.bind(mainMod .. " + SHIFT + CONTROL + right", hl.dsp.window.move({ workspace = "r+1" }))
+hl.bind(mainMod .. " + SHIFT + CONTROL + h", hl.dsp.window.move({ workspace = "r-1" }))
+hl.bind(mainMod .. " + SHIFT + CONTROL + l", hl.dsp.window.move({ workspace = "r+1" }))
 
 -- GESTURES
 hl.gesture({ fingers = 3, direction = "vertical", action = "workspace" })
