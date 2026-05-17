@@ -1,3 +1,0 @@
-popover.menu contents {
-    background-color: color-mix(in srgb, @popover_bg_color 50%, transparent);
-}

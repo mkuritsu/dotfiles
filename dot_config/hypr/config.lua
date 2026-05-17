@@ -16,4 +16,14 @@ hl.config({
 	binds = {
 		scroll_event_delay = 150,
 	},
+
+	decoration = {
+		rounding = 0,
+		blur = {
+			enabled = true,
+			size = 8,
+			passes = 2,
+			brightness = 0.9,
+		},
+	},
 })

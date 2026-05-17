@@ -6,8 +6,10 @@ return {
 		"MunifTanjim/nui.nvim",
 		"nvim-tree/nvim-web-devicons",
 	},
+	priority = 100,
 	lazy = false,
 	opts = {
+		close_if_last_window = true,
 		window = {
 			width = 25,
 			mappings = {
@@ -16,6 +18,10 @@ return {
 				["h"] = "close_node",
 			},
 		},
+		filesystem = {
+			hijack_netrw_behavior = "open_default",
+			follow_current_file = { enabled = true },
+		},
 	},
 	keys = {
 		{
@@ -23,7 +29,7 @@ return {
 			mode = { "n", "i" },
 			desc = "Toggle file tree",
 			function()
-				require("neo-tree.command").execute({ toggle = true })
+				require("neo-tree.command").execute({ reveal = true })
 			end,
 		},
 	},

@@ -1,7 +1,5 @@
 local mainMod = "SUPER"
 
--- local terminal = "ghostty +new-window"
--- local terminal = "foot"
 local terminal = "ghostty"
 local fileManager = "nautilus"
 local launcher = "vicinae toggle"
@@ -15,7 +13,14 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + B", hl.dsp.layout("togglesplit"))
 
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("uwsm stop"))
+hl.bind(mainMod .. " + SHIFT + E", function()
+	if IsUWSMActive() then
+		hl.dsp.exec_cmd("uwsm stop")
+	else
+		hl.dsp.exit()
+	end
+end)
+
 hl.bind("Print", hl.dsp.exec_cmd("$XDG_CONFIG_HOME/hypr/scripts/screenshot.sh"))
 
 hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd(lockScreen))
@@ -49,7 +54,7 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:mag
 
 -- WORKSPACES
 for i = 1, 10 do
-	local key = i % 10 -- 10 maps to key 0
+	local key = i % 10
 	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
 	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
 end
