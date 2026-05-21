@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+timestamp=$(date +%s)
+backup_file="$HOME/Downloads/backup_${timestamp}.zip"
+
+cd "$HOME"
+zip -erq "$backup_file" Documents Pictures
+
+echo "Backup created at: $backup_file"
+
