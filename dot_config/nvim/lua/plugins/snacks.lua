@@ -6,6 +6,7 @@ return {
 		picker = { enabled = true },
 		indent = { enabled = true },
 		notifier = { enabled = true },
+		explorer = { enabled = true },
 	},
 	keys = {
 		{
@@ -24,22 +25,30 @@ return {
 				Snacks.picker.grep()
 			end,
 		},
-        {
-            "<C-`>",
-            mode = {"n", "t"},
-            desc = "Toggle terminal",
-            function()
-                Snacks.terminal()
-            end
-        },
-        {
-            "<leader>p",
-            mode = "n",
-            desc = "Projects",
-            function()
-                local opts = { dev = {"~/Dev", "~/Projects"}}
-                Snacks.picker.projects(opts)
-            end
-        }
+		{
+			"<C-`>",
+			mode = { "n", "t" },
+			desc = "Toggle terminal",
+			function()
+				Snacks.terminal()
+			end,
+		},
+		{
+			"<leader>p",
+			mode = "n",
+			desc = "Projects",
+			function()
+				local opts = { dev = { "~/Dev", "~/Projects" } }
+				Snacks.picker.projects(opts)
+			end,
+		},
+		{
+			"<C-b>",
+			mode = { "n", "i" },
+			desc = "Toggle file tree",
+			function()
+				Snacks.explorer()
+			end,
+		},
 	},
 }

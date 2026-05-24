@@ -3,6 +3,7 @@ return {
 	event = "VeryLazy",
 	opts = {
 		preset = "helix",
+		delay = 100,
 	},
 	keys = {
 		{
