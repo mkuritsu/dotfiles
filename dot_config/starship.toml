@@ -17,11 +17,12 @@ format = "[$user]($style) "
 show_always = true
 
 [container]
-symbol = "📦"
+format = '[$symbol(\($name\))]($style) '
+symbol = ""
 
 [nix_shell]
-format = '[$symbol (\($name\))]($style) '
-symbol = "❄️"
+format = '[$symbol(\($name\))]($style) '
+symbol = ""
 
 [fill]
 symbol = " "

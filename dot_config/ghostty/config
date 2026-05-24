@@ -1,15 +1,22 @@
+# Style
 theme = "Catppuccin Mocha"
+gtk-custom-css = ./style.css
+
+# Font
 font-family = "JetBrainsMonoNL Nerd Font"
 font-size = 11
-shell-integration-features = ssh-terminfo,ssh-env
+font-style = SemiBold
+
+# Window
 window-padding-color = extend
 window-padding-x = 0
 window-padding-y = 0
 window-padding-balance = true
+
+# Misc
 resize-overlay = never
-title = "Ghostty"
 background-opacity = 0.9
 background-blur = true
-
-gtk-custom-css = ./style.css
+shell-integration-features = ssh-terminfo,ssh-env
 quit-after-last-window-closed = false
+

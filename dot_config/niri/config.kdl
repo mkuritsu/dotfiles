@@ -1,4 +1,3 @@
-spawn-sh-at-startup "systemctl start --user hyprpolkitagent"
 spawn-sh-at-startup "systemctl start --user dms"
 spawn-sh-at-startup "systemctl start --user opentabletdriver"
 spawn-sh-at-startup "systemctl start --user vicinae"
@@ -138,12 +137,17 @@ window-rule {
 }
 
 window-rule {
-    match app-id="^com.mitchellh.ghostty$"
+    match app-id="(com.mitchellh.ghostty)|(kitty)|(foot)|(Alacritty)"
 
     background-effect {
         blur true
         xray false
     }
+}
+
+window-rule {
+    match app-id="org.gnome.NautilusPreviewer"
+    open-floating true
 }
 
 layer-rule {
@@ -161,7 +165,8 @@ window-rule {
 binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
-    Mod+T hotkey-overlay-title="Open a Terminal" { spawn "ghostty" "+new-window"; }
+    // Mod+T hotkey-overlay-title="Open a Terminal" { spawn "ghostty" "+new-window"; }
+    Mod+T hotkey-overlay-title="Open a Terminal" { spawn "ghostty"; }
     Mod+Space hotkey-overlay-title="Run an Application" { spawn "vicinae" "toggle"; }
     Mod+E { spawn "nautilus"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen" { spawn-sh "loginctl lock-session"; }

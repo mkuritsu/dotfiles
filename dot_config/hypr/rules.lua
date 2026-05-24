@@ -29,6 +29,14 @@ hl.window_rule({
 	no_focus = true,
 })
 
+hl.window_rule({
+	name = "float-nautilus-preview",
+	match = {
+		class = "org.gnome.NautilusPreviewer",
+	},
+	float = true,
+})
+
 -- LAYERRULES
 hl.layer_rule({
 	name = "vicinae-blur",
