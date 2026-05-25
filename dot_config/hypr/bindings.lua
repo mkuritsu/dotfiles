@@ -15,9 +15,9 @@ hl.bind(mainMod .. " + B", hl.dsp.layout("togglesplit"))
 
 hl.bind(mainMod .. " + SHIFT + E", function()
 	if IsUWSMActive() then
-		hl.dsp.exec_cmd("uwsm stop")
+		hl.exec_cmd("uwsm stop")
 	else
-		hl.dsp.exit()
+		hl.dispatch(hl.dsp.exit())
 	end
 end)
 
@@ -56,8 +56,17 @@ hl.bind(mainMod .. " + SHIFT + S", hl.dsp.window.move({ workspace = "special:mag
 -- WORKSPACES
 for i = 1, 10 do
 	local key = i % 10
-	hl.bind(mainMod .. " + " .. key, hl.dsp.focus({ workspace = i }))
-	hl.bind(mainMod .. " + SHIFT + " .. key, hl.dsp.window.move({ workspace = i }))
+	hl.bind(mainMod .. " + " .. key, function()
+		local monitor = hl.get_active_monitor().id
+		local ws = i + 10 * monitor
+		hl.dispatch(hl.dsp.focus({ workspace = ws }))
+	end)
+
+	hl.bind(mainMod .. " + SHIFT + " .. key, function()
+		local monitor = hl.get_active_monitor().id
+		local ws = i + 10 * monitor
+		hl.dispatch(hl.dsp.window.move({ workspace = ws }))
+	end)
 end
 
 local focus_binds = {
@@ -86,4 +95,3 @@ hl.bind(mainMod .. " + SHIFT + CONTROL + l", hl.dsp.window.move({ workspace = "r
 
 -- GESTURES
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
--- hl.gesture({ fingers = 3, direction = "horizontal", action = "scroll_move" })

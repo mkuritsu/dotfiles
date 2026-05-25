@@ -408,6 +408,7 @@
   "notificationTimeoutNormal": 5000,
   "notificationTimeoutCritical": 0,
   "notificationCompactMode": true,
+  "notificationDedupeEnabled": true,
   "notificationPopupPosition": 0,
   "notificationAnimationSpeed": 1,
   "notificationCustomAnimationDuration": 400,
@@ -504,10 +505,6 @@
       "rightWidgets": [
         {
           "id": "systemTray",
-          "enabled": true
-        },
-        {
-          "id": "systemUpdate",
           "enabled": true
         },
         {

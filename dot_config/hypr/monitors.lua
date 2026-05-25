@@ -20,4 +20,4 @@ hl.monitor({
 	scale = 1,
 })
 
-hl.workspace_rule({ workspace = "10", monitor = "DP-2", default = true })
+hl.workspace_rule({ workspace = "11", monitor = "DP-2", default = true })

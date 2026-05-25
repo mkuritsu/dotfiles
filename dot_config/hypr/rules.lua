@@ -37,6 +37,15 @@ hl.window_rule({
 	float = true,
 })
 
+hl.window_rule({
+	name = "float-steam-friends-list",
+	match = {
+		class = "steam",
+		title = "Friends List",
+	},
+	float = true,
+})
+
 -- LAYERRULES
 hl.layer_rule({
 	name = "vicinae-blur",
