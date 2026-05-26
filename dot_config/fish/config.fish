@@ -58,3 +58,7 @@ if type -q eza
     alias ls="eza"
 end
 
+if type -q neovide
+    alias nvide="neovide --fork"
+end
+

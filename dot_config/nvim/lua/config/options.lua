@@ -20,3 +20,10 @@ vim.g.editorconfig = true
 vim.g.colorscheme_storage = vim.fn.stdpath("cache") .. "/last_colorscheme"
 vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
+
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+vim.g.neovide_cursor_animation_length = 0.1
+vim.g.neovide_cursor_trail_size = 0.1
+vim.g.neovide_cursor_vfx_mode = ""

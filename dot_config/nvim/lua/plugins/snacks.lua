@@ -6,7 +6,7 @@ return {
 		picker = { enabled = true },
 		indent = { enabled = true },
 		notifier = { enabled = true },
-		explorer = { enabled = true },
+		explorer = { enabled = false },
 	},
 	keys = {
 		{

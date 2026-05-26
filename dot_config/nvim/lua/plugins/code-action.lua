@@ -10,5 +10,13 @@ return {
 				require("tiny-code-action").code_action()
 			end,
 		},
+		{
+			"<C-.>",
+			mode = { "n", "i" },
+			desc = "Code actions",
+			function()
+				require("tiny-code-action").code_action()
+			end,
+		},
 	},
 }
