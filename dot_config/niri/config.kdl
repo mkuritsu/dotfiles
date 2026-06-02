@@ -1,6 +1,6 @@
-spawn-sh-at-startup "systemctl start --user dms"
-spawn-sh-at-startup "systemctl start --user opentabletdriver"
-spawn-sh-at-startup "systemctl start --user vicinae"
+spawn-sh-at-startup "systemctl start --user dms || dms run"
+spawn-sh-at-startup "systemctl start --user opentabletdriver || otd-daemon"
+spawn-sh-at-startup "systemctl start --user vicinae || vicinae server"
 spawn-sh-at-startup "flatpak run com.github.wwmm.easyeffects"
 
 // prefer-no-csd
@@ -33,7 +33,7 @@ input {
         accel-profile "flat"
     }
 
-    focus-follows-mouse max-scroll-amount="0%"
+    focus-follows-mouse max-scroll-amount="10%"
 }
 
 // Desktop monitors
@@ -63,7 +63,7 @@ output "eDP-1" {
 }
 
 layout {
-    gaps 12
+    gaps 8
     center-focused-column "never"
     preset-column-widths {
         proportion 0.33333
@@ -140,6 +140,7 @@ window-rule {
     }
 }
 
+// Blur terminal backgrounds
 window-rule {
     match app-id="(com.mitchellh.ghostty)|(kitty)|(foot)|(Alacritty)"
 
@@ -149,6 +150,7 @@ window-rule {
     }
 }
 
+// Open nautilus preview floating
 window-rule {
     match app-id="org.gnome.NautilusPreviewer"
     open-floating true
@@ -160,9 +162,16 @@ layer-rule {
     }
 }
 
+// Hide bitwarden from screen-capture
 window-rule {
     match app-id="chrome-nngceckbapebfimnlniiiahkandclblb-Default"
     block-out-from "screen-capture"
+    open-floating true
+}
+
+window-rule {
+    match app-id="steam" title="Friends List"
+
     open-floating true
 }
 
@@ -377,3 +386,6 @@ binds {
 
     Mod+Shift+P { power-off-monitors; }
 }
+
+include optional=true "./dms/colors.kdl"
+include optional=true "./dms/alttab.kdl"

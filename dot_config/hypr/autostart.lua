@@ -1,5 +1,6 @@
 hl.on("hyprland.start", function()
-	hl.exec_cmd("dms run")
-	hl.exec_cmd("vicinae server")
+	hl.exec_cmd("systemctl start --user dms || dms run")
+	hl.exec_cmd("systemctl start --user vicinae || vicinae server")
+	hl.exec_cmd("systemctl start --user opentabletdriver || otd-daemon")
 	hl.exec_cmd("flatpak run com.github.wwmm.easyeffects")
 end)
