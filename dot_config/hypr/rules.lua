@@ -46,6 +46,13 @@ hl.window_rule({
 	float = true,
 })
 
+hl.window_rule({
+	match = {
+		group = true,
+	},
+	no_anim = true,
+})
+
 -- LAYERRULES
 hl.layer_rule({
 	name = "vicinae-blur",

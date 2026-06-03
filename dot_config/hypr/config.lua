@@ -26,4 +26,14 @@ hl.config({
 			brightness = 0.9,
 		},
 	},
+
+	group = {
+		groupbar = {
+			enabled = true,
+			gradients = true,
+			height = 12,
+			font_size = 11,
+			font_family = "JetBrainsMonoNL Nerd Font",
+		},
+	},
 })

@@ -24,7 +24,7 @@ end)
 hl.bind("Print", hl.dsp.exec_cmd("$XDG_CONFIG_HOME/hypr/scripts/screenshot.sh area"))
 hl.bind("ALT+Print", hl.dsp.exec_cmd("$XDG_CONFIG_HOME/hypr/scripts/screenshot.sh monitor"))
 
-hl.bind(mainMod .. " + ALT + L", hl.dsp.exec_cmd(lockScreen))
+hl.bind(mainMod .. " + F10", hl.dsp.exec_cmd(lockScreen))
 hl.bind(mainMod .. " + Y", hl.dsp.exec_cmd("hyprpicker --lowercase-hex --autocopy"))
 
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
@@ -92,6 +92,13 @@ hl.bind(mainMod .. " + SHIFT + CONTROL + left", hl.dsp.window.move({ workspace =
 hl.bind(mainMod .. " + SHIFT + CONTROL + right", hl.dsp.window.move({ workspace = "r+1" }))
 hl.bind(mainMod .. " + SHIFT + CONTROL + h", hl.dsp.window.move({ workspace = "r-1" }))
 hl.bind(mainMod .. " + SHIFT + CONTROL + l", hl.dsp.window.move({ workspace = "r+1" }))
+
+-- Groups
+hl.bind(mainMod .. " + G", hl.dsp.group.toggle())
+hl.bind(mainMod .. " + ALT + H", hl.dsp.group.prev())
+hl.bind(mainMod .. " + ALT + L", hl.dsp.group.next())
+hl.bind(mainMod .. " + SHIFT + ALT + H", hl.dsp.group.move_window({ forward = false }))
+hl.bind(mainMod .. " + SHIFT + ALT + L", hl.dsp.group.move_window({ forward = true }))
 
 -- GESTURES
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })

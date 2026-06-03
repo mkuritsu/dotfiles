@@ -7,3 +7,5 @@ require("config")
 require("input")
 require("monitors")
 require("rules")
+
+require("dms/colors")
