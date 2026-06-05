@@ -95,10 +95,19 @@ hl.bind(mainMod .. " + SHIFT + CONTROL + l", hl.dsp.window.move({ workspace = "r
 
 -- Groups
 hl.bind(mainMod .. " + G", hl.dsp.group.toggle())
+
 hl.bind(mainMod .. " + ALT + H", hl.dsp.group.prev())
 hl.bind(mainMod .. " + ALT + L", hl.dsp.group.next())
 hl.bind(mainMod .. " + SHIFT + ALT + H", hl.dsp.group.move_window({ forward = false }))
 hl.bind(mainMod .. " + SHIFT + ALT + L", hl.dsp.group.move_window({ forward = true }))
+
+hl.bind(mainMod .. " + ALT + left", hl.dsp.group.prev())
+hl.bind(mainMod .. " + ALT + right", hl.dsp.group.next())
+hl.bind(mainMod .. " + SHIFT + ALT + left", hl.dsp.group.move_window({ forward = false }))
+hl.bind(mainMod .. " + SHIFT + ALT + right", hl.dsp.group.move_window({ forward = true }))
+
+hl.bind(mainMod .. " + TAB", hl.dsp.group.next())
+hl.bind(mainMod .. " + SHIFT + TAB", hl.dsp.group.prev())
 
 -- GESTURES
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })
