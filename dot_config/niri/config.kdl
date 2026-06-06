@@ -1,17 +1,17 @@
-spawn-sh-at-startup "systemctl start --user dms || dms run"
 spawn-sh-at-startup "systemctl start --user opentabletdriver || otd-daemon"
-spawn-sh-at-startup "systemctl start --user vicinae || vicinae server"
+spawn-sh-at-startup "vicinae server"
+spawn-sh-at-startup "dms run"
 spawn-sh-at-startup "flatpak run com.github.wwmm.easyeffects"
 
-// prefer-no-csd
+prefer-no-csd
 
 environment {
     ELECTRON_OZONE_PLATFORM_HINT "wayland"
 }
 
 cursor {
-    xcursor-theme "Adwaita"
-    xcursor-size 24
+    xcursor-theme "Bibata-Modern-Classic"
+    xcursor-size 20
 }
 
 input {
@@ -63,7 +63,7 @@ output "eDP-1" {
 }
 
 layout {
-    gaps 8
+    gaps 3
     center-focused-column "never"
     preset-column-widths {
         proportion 0.33333
@@ -85,6 +85,14 @@ layout {
         spread 5
         offset x=0 y=5
         color "#0007"
+    }
+
+    tab-indicator {
+        width 8
+        gap 3
+        length total-proportion=1.0
+        position "top"
+        place-within-column
     }
 }
 
@@ -116,7 +124,7 @@ window-rule {
 
 // rouded corners
 window-rule {
-    geometry-corner-radius 12
+    geometry-corner-radius 0
     clip-to-geometry true
     draw-border-with-background false
     background-effect {
@@ -385,6 +393,8 @@ binds {
     Ctrl+Alt+Delete { quit; }
 
     Mod+Shift+P { power-off-monitors; }
+
+    Mod+G { toggle-column-tabbed-display; }
 }
 
 include optional=true "./dms/colors.kdl"
