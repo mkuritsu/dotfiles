@@ -7,13 +7,14 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "redact_private_values": true,
   "agent_servers": {
     "opencode": {
       "default_config_options": {
-        "model": "opencode/deepseek-v4-flash-free"
+        "model": "opencode/deepseek-v4-flash-free",
       },
-      "type": "registry"
-    }
+      "type": "registry",
+    },
   },
   "agent": {
     "dock": "right",
@@ -44,6 +45,16 @@
         "checkOnSave": true,
         "check": {
           "command": "clippy",
+        },
+      },
+    },
+  },
+  "languages": {
+    "Nix": {
+      "formatter": {
+        "external": {
+          "command": "alejandra",
+          "arguments": ["-"],
         },
       },
     },

@@ -1,7 +1,5 @@
-spawn-sh-at-startup "systemctl start --user opentabletdriver || otd-daemon"
 spawn-sh-at-startup "vicinae server"
 spawn-sh-at-startup "dms run"
-spawn-sh-at-startup "flatpak run com.github.wwmm.easyeffects"
 
 prefer-no-csd
 
@@ -80,7 +78,7 @@ layout {
 
     shadow {
         on
-        draw-behind-window true
+        draw-behind-window false
         softness 30
         spread 5
         offset x=0 y=5
@@ -94,6 +92,13 @@ layout {
         position "top"
         place-within-column
     }
+}
+
+blur {
+    passes 5
+    offset 0.7
+    noise 0.03
+    saturation 2.0
 }
 
 hotkey-overlay {
@@ -126,10 +131,6 @@ window-rule {
 window-rule {
     geometry-corner-radius 0
     clip-to-geometry true
-    draw-border-with-background false
-    background-effect {
-        xray false
-    }
 }
 
 // Blur the background behind pop-up menus in Nautilus.
@@ -152,6 +153,8 @@ window-rule {
 window-rule {
     match app-id="(com.mitchellh.ghostty)|(kitty)|(foot)|(Alacritty)"
 
+
+    draw-border-with-background false
     background-effect {
         blur true
         xray false
