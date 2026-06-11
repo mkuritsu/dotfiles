@@ -62,3 +62,5 @@ if type -q neovide
     alias nvide="neovide --fork"
 end
 
+set -x NVIM_APPNAME "nvim-v2"
+

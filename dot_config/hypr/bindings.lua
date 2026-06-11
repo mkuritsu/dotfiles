@@ -1,7 +1,7 @@
 local mainMod = "SUPER"
 
 local terminal = "ghostty"
-local fileManager = "nautilus"
+local fileManager = "dolphin"
 local launcher = "vicinae toggle"
 local lockScreen = "loginctl lock-session"
 

@@ -7,6 +7,11 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)"
+  },
   "redact_private_values": true,
   "agent_servers": {
     "opencode": {
@@ -23,7 +28,7 @@
     "model_parameters": [],
   },
   "helix_mode": false,
-  "vim_mode": false,
+  "vim_mode": true,
   "cli_default_open_behavior": "new_window",
   "project_panel": {
     "dock": "left",
@@ -32,9 +37,9 @@
   "ui_font_size": 16,
   "buffer_font_size": 14,
   "theme": {
-    "mode": "system",
+    "mode": "dark",
     "light": "One Light",
-    "dark": "Catppuccin Mocha - No Italics",
+    "dark": "Catppuccin Macchiato - No Italics",
   },
   "buffer_font_features": {
     "calt": false,
