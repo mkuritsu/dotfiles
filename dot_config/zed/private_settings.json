@@ -7,10 +7,27 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "edit_predictions": {
+    "ollama": {
+      "model": "hf.co/bartowski/zed-industries_zeta-2-GGUF:latest",
+      "prompt_format": "zeta2",
+      "max_output_tokens": 10000,
+    },
+    "open_ai_compatible_api": {
+      "api_url": "",
+    },
+    "mode": "subtle",
+    "provider": "zed",
+  },
+  "use_podman": true,
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
-    "dark": "Zed (Default)"
+    "dark": "Zed (Default)",
   },
   "redact_private_values": true,
   "agent_servers": {
@@ -45,14 +62,14 @@
     "calt": false,
   },
   "lsp": {
-    "rust-analyzer": {
-      "initialization_options": {
-        "checkOnSave": true,
-        "check": {
-          "command": "clippy",
-        },
-      },
-    },
+    // "rust-analyzer": {
+    //   "initialization_options": {
+    //     "checkOnSave": true,
+    //     "check": {
+    //       "command": "clippy",
+    //     },
+    //   },
+    // },
   },
   "languages": {
     "Nix": {

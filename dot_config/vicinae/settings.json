@@ -9,20 +9,46 @@
 // Learn more about configuration at https://docs.vicinae.com/config
 
 {
-  "$schema": "https://vicinae.com/schemas/config.json",
-  "theme": {
-    "dark": {
-      "name": "vicinae-dark"
-    }
-  },
-  "launcher_window": {
-    "opacity": 0.75,
-    "blur": {
-      "enabled": true
-    },
-    "layer_shell": {
-      "enabled": true,
-      "layer": "overlay"
-    }
-  }
+   "$schema": "https://vicinae.com/schemas/config.json",
+   "font": {
+      "rendering": "qt",
+      "normal": {}
+   },
+   "theme": {
+      "dark": {
+         "name": "vicinae-dark"
+      }
+   },
+   "launcher_window": {
+      "opacity": 0.75,
+      "blur": {
+         "enabled": true
+      },
+      "layer_shell": {
+         "layer": "overlay",
+         "enabled": true
+      }
+   },
+   "favorites": [],
+   "providers": {
+      "applications": {
+         "entrypoints": {
+            "foot-server": {
+               "enabled": false
+            },
+            "khal": {
+               "enabled": false
+            },
+            "nvim": {
+               "enabled": false
+            },
+            "uuctl": {
+               "enabled": false
+            },
+            "yazi": {
+               "enabled": true
+            }
+         }
+      }
+   }
 }

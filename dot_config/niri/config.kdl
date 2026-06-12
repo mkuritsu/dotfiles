@@ -8,8 +8,8 @@ environment {
 }
 
 cursor {
-    xcursor-theme "Bibata-Modern-Classic"
-    xcursor-size 20
+    xcursor-theme "Adwaita"
+    xcursor-size 24
 }
 
 input {
@@ -48,27 +48,30 @@ output "DP-2" {
 }
 
 // Laptop monitors
-output "HDMI-A-1" {
-    mode "1920x1080@120.000"
-    scale 1
-    position x=1920 y=0
-}
-
 output "eDP-1" {
     mode "1920x1200@59.999"
     scale 1
     position x=0 y=0
 }
 
+output "HDMI-A-1" {
+    mode "1920x1080@120.000"
+    scale 1
+    position x=1920 y=0
+}
+
 layout {
     gaps 3
+
     center-focused-column "never"
+	always-center-single-column
+
+    default-column-width { proportion 0.5; }
     preset-column-widths {
         proportion 0.33333
         proportion 0.5
         proportion 0.66667
     }
-    default-column-width { proportion 0.5; }
 
     focus-ring {
         width 3
@@ -89,9 +92,13 @@ layout {
         width 8
         gap 3
         length total-proportion=1.0
-        position "top"
+        // position "top"
         place-within-column
     }
+}
+
+clipboard {
+	disable-primary
 }
 
 blur {
