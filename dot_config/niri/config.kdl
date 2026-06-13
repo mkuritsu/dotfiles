@@ -1,5 +1,5 @@
-spawn-sh-at-startup "vicinae server"
-spawn-sh-at-startup "dms run"
+spawn-sh-at-startup "systemctl start --user vicinae || vicinae server"
+spawn-sh-at-startup "systemctl start --user dms || dms run"
 
 prefer-no-csd
 
@@ -38,13 +38,13 @@ input {
 output "DP-1" {
     mode "1920x1080@120"
     scale 1
-    position x=1920 y=0
+    position x=0 y=0
 }
 
 output "DP-2" {
     mode "1920x1080@60"
     scale 1
-    position x=0 y=0
+    position x=-1920 y=0
 }
 
 // Laptop monitors
@@ -120,24 +120,21 @@ window-rule {
     open-floating true
 }
 
-// disable vicinae focus-ring
-window-rule {
-    match app-id=r#"vicinae"#
-    focus-ring {
-        off
-    }
-}
-
 // default full width applications
 window-rule {
     match app-id=r#"(helium)|(discord)"#
     default-column-width { proportion 1.0; }
 }
 
-// rouded corners
+// global window rules
 window-rule {
     geometry-corner-radius 0
     clip-to-geometry true
+    draw-border-with-background false
+	background-effect {
+		blur true
+		xray false
+	}
 }
 
 // Blur the background behind pop-up menus in Nautilus.
@@ -147,7 +144,6 @@ window-rule {
     background-effect {
         blur true
     }
-
     popups {
         geometry-corner-radius 15
         background-effect {
@@ -159,7 +155,6 @@ window-rule {
 // Blur terminal backgrounds
 window-rule {
     match app-id="(com.mitchellh.ghostty)|(kitty)|(foot)|(Alacritty)"
-
 
     draw-border-with-background false
     background-effect {
@@ -174,23 +169,25 @@ window-rule {
     open-floating true
 }
 
-layer-rule {
-    background-effect {
-        xray false
-    }
-}
-
 // Hide bitwarden from screen-capture
 window-rule {
     match app-id="chrome-nngceckbapebfimnlniiiahkandclblb-Default"
+
     block-out-from "screen-capture"
     open-floating true
 }
 
+// Open steam friends list floatig
 window-rule {
     match app-id="steam" title="Friends List"
 
     open-floating true
+}
+
+layer-rule {
+    background-effect {
+        xray false
+    }
 }
 
 binds {
