@@ -22,26 +22,9 @@ vim.api.nvim_create_autocmd("VimEnter", {
 	end,
 })
 
--- open file picker when opening a directory
-vim.api.nvim_create_autocmd("VimEnter", {
-	once = true,
-	callback = function()
-		if vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
-			Snacks.picker.files()
-		end
-	end,
-})
-
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "*" },
 	callback = function(args)
 		pcall(vim.treesitter.start, args.buf)
-	end,
-})
-
-vim.api.nvim_create_autocmd("ColorScheme", {
-	callback = function()
-		vim.fn.mkdir(vim.fn.stdpath("cache"), "p")
-		vim.fn.writefile({ vim.g.colors_name }, vim.g.colorscheme_storage)
 	end,
 })
