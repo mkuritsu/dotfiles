@@ -18,5 +18,5 @@ resize-overlay = never
 background-opacity = 0.85
 background-blur = true
 shell-integration-features = ssh-terminfo,ssh-env
-quit-after-last-window-closed = false
+gtk-single-instance = false
 

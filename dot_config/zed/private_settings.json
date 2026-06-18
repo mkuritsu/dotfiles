@@ -39,6 +39,13 @@
     },
   },
   "agent": {
+    "default_profile": "ask",
+    "default_model": {
+      "provider": "copilot_chat",
+      "model": "gpt-5.4-mini",
+      "enable_thinking": true,
+      "effort": "high"
+    },
     "dock": "right",
     "sidebar_side": "right",
     "favorite_models": [],

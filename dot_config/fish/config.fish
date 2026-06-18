@@ -61,11 +61,3 @@ end
 if type -q neovide
     alias nvide="neovide --fork"
 end
-
-set -x NVIM_APPNAME "nvim-v2"
-
-
-# Added by LM Studio CLI (lms)
-set -gx PATH $PATH /home/kuritsu/.lmstudio/bin
-# End of LM Studio CLI section
-

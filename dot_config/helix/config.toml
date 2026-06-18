@@ -1,0 +1,34 @@
+theme = "my_theme"
+
+[editor]
+bufferline = "always"
+end-of-line-diagnostics = "hint"
+mouse = true
+
+[editor.inline-diagnostics]
+cursor-line = "warning"
+
+[editor.cursor-shape]
+insert = "bar"
+normal = "block"
+
+[editor.file-picker]
+hidden = true
+
+[editor.indent-guides]
+render = true
+
+[keys.normal]
+C-s = ":w"
+C-e = [
+  ':sh rm -f /tmp/unique-file',
+  ':insert-output yazi %{buffer_name} --chooser-file=/tmp/unique-file',
+  ':insert-output echo "\x1b[?1049h\x1b[?2004h" > /dev/tty',
+  ':open %sh{cat /tmp/unique-file}',
+  ':redraw',
+]
+
+[keys.normal.space]
+g = "global_search"
+"/" = "changed_file_picker"
+o = ":buffer-close-others"
