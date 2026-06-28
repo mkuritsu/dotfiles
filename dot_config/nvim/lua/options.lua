@@ -6,6 +6,7 @@ vim.opt.cursorline = false
 vim.opt.wrap = false
 vim.opt.number = true
 vim.opt.relativenumber = true
+vim.opt.cursorline = true
 
 vim.diagnostic.enable = true
 vim.diagnostic.config({ virtual_text = true })

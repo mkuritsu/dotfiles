@@ -5,11 +5,49 @@ local fileManager = "dolphin"
 local launcher = "vicinae toggle"
 local lockScreen = "loginctl lock-session"
 
+-- Utility functions
+local function get_active_workspace()
+	local workspace = hl.get_active_workspace()
+	if hl.get_active_special_workspace() then
+		workspace = hl.get_active_special_workspace()
+	end
+	return workspace
+end
+
+local function set_workspace_layout(workspace, layout)
+	if workspace.special then
+		hl.workspace_rule({ workspace = tostring(workspace.name), layout = layout })
+	else
+		hl.workspace_rule({ workspace = tostring(workspace.id), layout = layout })
+	end
+end
+
+-- Misc binds
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(launcher))
+hl.bind("ALT + SPACE", hl.dsp.exec_cmd(launcher))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("dms ipc call hypr openOverview"))
+hl.bind(mainMod .. " + P", function()
+	-- https://wiki.hypr.land/Configuring/Advanced-and-Cool/Uncommon-tips-and-tricks/#per-workspace-layouts
+	local workspace = get_active_workspace()
+	if not workspace then
+		return
+	end
+
+	local layouts = { "dwindle", "scrolling", "master" } -- removed monocle, if I want a better monocle i just use groups
+	local next_layout = "dwindle"
+	for i = 1, #layouts do
+		if layouts[i] == workspace.tiled_layout then
+			local next_layout_idx = (i % #layouts) + 1
+			next_layout = layouts[next_layout_idx]
+			break
+		end
+	end
+
+	set_workspace_layout(workspace, next_layout)
+	hl.exec_cmd('notify-send -a Hyprland "Layout changed to ' .. next_layout .. '"')
+end)
 
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + B", hl.dsp.layout("togglesplit"))
@@ -109,6 +147,9 @@ hl.bind(mainMod .. " + SHIFT + ALT + right", hl.dsp.group.move_window({ forward 
 
 hl.bind(mainMod .. " + TAB", hl.dsp.group.next())
 hl.bind(mainMod .. " + SHIFT + TAB", hl.dsp.group.prev())
+
+hl.bind("ALT + TAB", hl.dsp.layout("cyclenext"))
+hl.bind("ALT + SHIFT + TAB", hl.dsp.layout("cycleprev"))
 
 -- GESTURES
 hl.gesture({ fingers = 3, direction = "horizontal", action = "workspace" })

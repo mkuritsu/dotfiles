@@ -61,3 +61,7 @@ end
 if type -q neovide
     alias nvide="neovide --fork"
 end
+
+if type -q opencode
+    alias oc="opencode"
+end

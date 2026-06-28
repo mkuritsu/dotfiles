@@ -1,5 +1,6 @@
 vim.pack.add({
 	-- LSPs, highlithing, suggestions, etc...
+	{ src = "https://github.com/folke/lazydev.nvim" },
 	{ src = "https://github.com/neovim/nvim-lspconfig" },
 	{ src = "https://github.com/mason-org/mason.nvim" },
 	{ src = "https://github.com/mason-org/mason-lspconfig.nvim" },
@@ -8,10 +9,11 @@ vim.pack.add({
 	{ src = "https://github.com/saghen/blink.cmp", version = "v1" },
 	{ src = "https://github.com/stevearc/conform.nvim" },
 
-	-- Style
+	-- Style/UI
 	{ src = "https://github.com/catppuccin/nvim", name = "catppuccin" },
 	{ src = "https://github.com/nvim-lualine/lualine.nvim" },
 	{ src = "https://github.com/nvim-tree/nvim-web-devicons" },
+	{ src = "https://github.com/j-hui/fidget.nvim" },
 
 	-- Utils
 	{ src = "https://github.com/folke/todo-comments.nvim" },
@@ -20,7 +22,7 @@ vim.pack.add({
 	{ src = "https://github.com/windwp/nvim-ts-autotag" },
 
 	-- Navigation
-	{ src = "https://github.com/nvim-telescope/telescope.nvim" },
+	{ src = "https://github.com/folke/snacks.nvim" },
 	{ src = "https://github.com/stevearc/oil.nvim" },
 	{ src = "https://github.com/folke/flash.nvim" },
 
@@ -62,6 +64,9 @@ local lsps = {
 	"dockerls",
 }
 
+vim.lsp.enable("clangd")
+vim.lsp.enable("rust-analyzer")
+
 require("nvim-treesitter").install(grammars)
 require("nvim-treesitter-textobjects").setup({
 	select = {
@@ -78,6 +83,12 @@ require("nvim-treesitter-textobjects").setup({
 require("mason").setup()
 require("mason-lspconfig").setup({
 	ensure_installed = lsps,
+})
+
+require("lazydev").setup({
+	library = {
+		{ path = "luvit-meta/library", words = { "vim%.uv" } },
+	},
 })
 
 local js_formatters = { "oxfmt", "biome", "prettierd", "prettier", stop_after_first = true }
@@ -109,6 +120,7 @@ require("blink.cmp").setup({
 })
 
 -- Navigation
+require("snacks").setup({})
 require("oil").setup({
 	default_file_explorer = true,
 	view_options = {
@@ -123,11 +135,6 @@ require("nvim-autopairs").setup({
 -- UI
 require("todo-comments").setup({
 	signs = false,
-})
-
-require("catppuccin").setup({
-	flavour = "mocha",
-	transparent_background = true,
 })
 
 require("gitsigns").setup({
@@ -150,5 +157,15 @@ require("lualine").setup({
 		lualine_x = { "encoding", "fileformat", "filetype" },
 		lualine_y = { "progress" },
 		lualine_z = { "location" },
+	},
+})
+
+require("fidget").setup({})
+
+require("catppuccin").setup({
+	flavour = "mocha",
+	transparent_background = false,
+	float = {
+		transparent = true,
 	},
 })

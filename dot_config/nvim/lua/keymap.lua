@@ -1,5 +1,5 @@
 -- Utility functions
-function set_textobject_keymap(keymap, selection)
+local function set_textobject_keymap(keymap, selection)
 	vim.keymap.set("v", keymap, function()
 		require("nvim-treesitter-textobjects.select").select_textobject(selection, "textobjects")
 	end)
@@ -12,12 +12,19 @@ set_textobject_keymap("ac", "@class.outer")
 set_textobject_keymap("ic", "@class.inner")
 set_textobject_keymap("as", "@local.scope")
 
--- Telescope
-local ts = require("telescope.builtin")
-vim.keymap.set("n", "<leader>f", ts.find_files, { desc = "Telescope find files" })
-vim.keymap.set("n", "<leader>g", ts.live_grep, { desc = "Telescope live grep" })
-vim.keymap.set("n", "<leader>b", ts.buffers, { desc = "Telescope buffers" })
-vim.keymap.set("n", "<leader>tds", "<CMD>TodoTelescope<CR>")
+-- Snacks picker
+vim.keymap.set("n", "<leader>f", function()
+	Snacks.picker.files()
+end, { desc = "Find files" })
+vim.keymap.set("n", "<leader>g", function()
+	Snacks.picker.grep()
+end, { desc = "Live grep" })
+vim.keymap.set("n", "<leader>b", function()
+	Snacks.picker.buffers()
+end, { desc = "Buffers" })
+vim.keymap.set("n", "<leader>tds", function()
+	Snacks.picker.grep({ pattern = "TODO|FIXME|HACK|WARN|PERF|NOTE" })
+end, { desc = "Todo comments" })
 
 -- Normify
 vim.keymap.set("n", "<C-Tab>", ":bnext<CR>")
