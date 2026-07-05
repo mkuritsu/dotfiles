@@ -1,0 +1,7 @@
+.config/nvim/nvim-pack-lock.json
+.config/herdr/herdr-server.log
+.config/herdr/herdr-client.log
+.config/herdr/session.json
+.config/fish/fish_variables
+.config/fish/conf.d/vite-plus.fish
+.config/fish/conf.d/rustup.fish

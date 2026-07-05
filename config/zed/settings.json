@@ -1,0 +1,21 @@
+{
+  "project_panel": {
+    "dock": "left",
+  },
+  "vim_mode": true,
+  "helix_mode": false,
+  "base_keymap": "VSCode",
+  "ui_font_size": 16,
+  "buffer_font_size": 14,
+  "buffer_font_features": {
+    "calt": false,
+  },
+  "colorize_brackets": true,
+  "cli_default_open_behavior": "new_window",
+  "redact_private_values": true,
+  "theme": {
+    "mode": "system",
+    "light": "One Light",
+    "dark": "Catppuccin Macchiato - No Italics",
+  },
+}
