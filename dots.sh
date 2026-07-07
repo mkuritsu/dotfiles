@@ -40,6 +40,7 @@ Commands:
   unlink            Remove symlinks created by link (restores .bak files)
   check             List files in linked directories not tracked in the repo
   add <file>        Copy a file into the repo and replace it with a symlink
+  ignore <path>     Resolve path and add it to .dotsignore
   help              Show this help message
 
 Options:
@@ -379,6 +380,48 @@ cmd_add() {
     echo "Added: $target_file -> $repo_full"
 }
 
+cmd_ignore() {
+    local raw_path="${1:-}"
+    [[ -z "$raw_path" ]] && { echo "Error: ignore requires a file path." >&2; exit 1; }
+
+    # Expand ~ explicitly, resolve directory but not the final component
+    local expanded="${raw_path/#\~/$HOME}"
+    expanded="${expanded%/}"
+    local dir dir_abs base abs_path
+    dir="$(dirname "$expanded")"
+    dir_abs="$(realpath "$dir" 2>/dev/null)" || {
+        echo "Error: cannot resolve path '$raw_path'." >&2
+        exit 1
+    }
+    base="$(basename "$expanded")"
+    abs_path="$dir_abs/$base"
+
+    [[ "$abs_path" == "$HOME"* ]] || {
+        echo "Error: path '$raw_path' is not under \$HOME ($HOME)." >&2
+        exit 1
+    }
+
+    local home_rel="${abs_path#$HOME/}"
+
+    load_dotsignore
+
+    local pattern
+    for pattern in "${DOTSIGNORE_PATHS[@]}"; do
+        [[ "$pattern" == "$home_rel" ]] && {
+            echo "Already ignored: $home_rel"
+            return 0
+        }
+    done
+
+    if [[ -f "$DOTSIGNORE_FILE" ]]; then
+        local last_char
+        last_char="$(tail -c 1 "$DOTSIGNORE_FILE")"
+        [[ "$last_char" != $'\n' ]] && printf '\n' >> "$DOTSIGNORE_FILE"
+    fi
+    echo "$home_rel" >> "$DOTSIGNORE_FILE"
+    echo "Added to .dotsignore: $home_rel"
+}
+
 cmd_unlink() {
     local dry_run=false restore=false
     for arg in "$@"; do
@@ -436,6 +479,7 @@ case "${1:-}" in
     unlink) shift; cmd_unlink "${@:-}" ;;
     check)  shift; cmd_check "${@:-}" ;;
     add)   shift; [[ $# -lt 1 ]] && { echo "Error: add requires a file path." >&2; exit 1; }; cmd_add "$@" ;;
+    ignore) shift; [[ $# -lt 1 ]] && { echo "Error: ignore requires a file path." >&2; exit 1; }; cmd_ignore "$@" ;;
     help|--help|-h) usage ;;
     *)     echo "Unknown command: $1"; usage ;;
 esac
