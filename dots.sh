@@ -31,6 +31,22 @@ LINUX_ONLY_PATHS=(
     "config/vicinae"
 )
 
+# ─── Profile ─────────────────────────────────────────────────
+
+PROFILE_DIR="$HOME/.local/state/dots"
+PROFILE_FILE="$PROFILE_DIR/profile"
+ACTIVE_PROFILE=""
+
+load_profile() {
+    if [[ "${DOTS_PROFILE+set}" == "set" ]]; then
+        ACTIVE_PROFILE="${DOTS_PROFILE:-}"
+    elif [[ -f "$PROFILE_FILE" ]]; then
+        ACTIVE_PROFILE="$(< "$PROFILE_FILE")"
+    else
+        ACTIVE_PROFILE=""
+    fi
+}
+
 usage() {
     cat <<EOF
 Usage: $SCRIPT_NAME <command> [options]
@@ -41,12 +57,15 @@ Commands:
   check             List files in linked directories not tracked in the repo
   add <file>        Copy a file into the repo and replace it with a symlink
   ignore <path>     Resolve path and add it to .dotsignore
+  profile           Manage profiles (set, list, unset)
   help              Show this help message
 
 Options:
   --dry-run         For link/unlink: show what would be done without doing it
   --restore         For unlink: restore .bak files when removing symlinks
+  --force, -f       For link: overwrite existing symlinks pointing elsewhere
   --interactive, -i For check: prompt before adding each untracked file
+  --profile <name>  For add/ignore/link/check: target a specific profile
 EOF
     exit 1
 }
@@ -58,26 +77,31 @@ DOTSIGNORE_PATHS=()
 
 load_dotsignore() {
     DOTSIGNORE_PATHS=()
-    if [[ -f "$DOTSIGNORE_FILE" ]]; then
-        local line
+    local files=("$DOTSIGNORE_FILE")
+    if [[ -n "$ACTIVE_PROFILE" ]]; then
+        local pf="$REPO_DIR/profiles/$ACTIVE_PROFILE/.dotsignore"
+        [[ -f "$pf" ]] && files+=("$pf")
+    fi
+    local f line
+    for f in "${files[@]}"; do
+        [[ -f "$f" ]] || continue
         while IFS= read -r line || [[ -n "$line" ]]; do
-            line="${line%%#*}"        # strip comments
-            line="${line#"${line%%[![:space:]]*}"}"  # trim leading
-            line="${line%"${line##*[![:space:]]}"}"  # trim trailing
+            line="${line%%#*}"
+            line="${line#"${line%%[![:space:]]*}"}"
+            line="${line%"${line##*[![:space:]]}"}"
             [[ -z "$line" ]] && continue
             DOTSIGNORE_PATHS+=("$line")
-        done < "$DOTSIGNORE_FILE"
-    fi
+        done < "$f"
+    done
 }
 
 is_ignored() {
-    local target_path="$1"   # absolute target path
-    local repo_rel="$2"      # repo-relative path
-    local home_rel="${target_path#$HOME/}"  # $HOME-relative path
+    local target_path="$1"
+    local repo_rel="$2"
+    local home_rel="${target_path#$HOME/}"
     local pattern
     for pattern in "${DOTSIGNORE_PATHS[@]}"; do
         local pat="${pattern%/}"
-        # Match against repo-relative, $HOME-relative, or absolute
         if [[ "$repo_rel" == "$pat" || "$repo_rel" == "$pat"/* ]] || \
            [[ "$home_rel" == "$pat" || "$home_rel" == "$pat"/* ]] || \
            [[ "$target_path" == "$pat" ]]; then
@@ -85,6 +109,21 @@ is_ignored() {
         fi
     done
     return 1
+}
+
+# ─── File sources ───────────────────────────────────────────
+
+get_shared_files() {
+    find "$REPO_DIR" -type f ! -path '*/.git/*' ! -path '*/profiles/*' \
+        ! -name "$SCRIPT_NAME" ! -name '.dotsignore' \
+        ! -name 'README.md' -print0
+}
+
+get_profile_files() {
+    local profile="$1"
+    local dir="$REPO_DIR/profiles/$profile"
+    [[ -d "$dir" ]] || return 0
+    find "$dir" -type f ! -name '.dotsignore' -print0
 }
 
 # ─── OS / filtering ────────────────────────────────────────
@@ -106,14 +145,12 @@ should_include() {
 
 # ─── Path conversion ───────────────────────────────────────
 
-# Repo-relative path → $HOME-absolute target path
 to_target_path() {
     local repo_rel="$1"
     local first="${repo_rel%%/*}"
     local rest=""
     [[ "$first" != "$repo_rel" ]] && rest="${repo_rel#*/}"
 
-    # Map first component using DIR_MAPPINGS
     local mapped_first=""
     local mapping rn tn
     for mapping in "${DIR_MAPPINGS[@]}"; do
@@ -135,7 +172,6 @@ to_target_path() {
     echo "$target"
 }
 
-# Process path components: strip prefixes, apply dot_ → .
 process_path_components() {
     local path="$1"
     local result="" part
@@ -146,7 +182,6 @@ process_path_components() {
     echo "${result#/}"
 }
 
-# $HOME-absolute target path → repo-relative path
 to_repo_path() {
     local target_path="$1"
     local rel="${target_path#$HOME/}"
@@ -180,15 +215,44 @@ to_repo_path() {
 # ─── Commands ───────────────────────────────────────────────
 
 cmd_link() {
-    local dry_run=false
-    [[ "${1:-}" == "--dry-run" ]] && dry_run=true
+    local dry_run=false force=false
+    local profile_override=""
 
-    local count=0 file rel tgt tgt_dir cur
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --dry-run) dry_run=true; shift ;;
+            --force|-f) force=true; shift ;;
+            --profile) [[ $# -ge 2 ]] && { profile_override="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
+            *) shift ;;
+        esac
+    done
+
+    load_profile
+    [[ -n "$profile_override" ]] && ACTIVE_PROFILE="$profile_override"
+
+    declare -A targets
+    local file rel tgt
+
     while IFS= read -r -d '' file; do
         rel="${file#$REPO_DIR/}"
         ! should_include "$rel" && continue
-
         tgt=$(to_target_path "$rel")
+        targets["$tgt"]="$file"
+    done < <(get_shared_files)
+
+    if [[ -n "$ACTIVE_PROFILE" ]]; then
+        local prof_dir="$REPO_DIR/profiles/$ACTIVE_PROFILE"
+        while IFS= read -r -d '' file; do
+            rel="${file#$prof_dir/}"
+            ! should_include "$rel" && continue
+            tgt=$(to_target_path "$rel")
+            targets["$tgt"]="$file"
+        done < <(get_profile_files "$ACTIVE_PROFILE")
+    fi
+
+    local count=0 tgt_dir cur
+    for tgt in "${!targets[@]}"; do
+        file="${targets[$tgt]}"
         tgt_dir=$(dirname "$tgt")
 
         if $dry_run; then
@@ -202,7 +266,13 @@ cmd_link() {
         if [[ -L "$tgt" ]]; then
             cur=$(readlink "$tgt")
             [[ "$cur" == "$file" ]] && continue
-            echo "Warning: $tgt links to $cur (expected $file). Skipping."
+            if $force; then
+                ln -sf "$file" "$tgt"
+                echo "Linked (forced): $tgt -> $file"
+                ((++count))
+            else
+                echo "Warning: $tgt links to $cur (expected $file). Skipping."
+            fi
         elif [[ -e "$tgt" ]]; then
             mv "$tgt" "$tgt.bak"
             echo "Backed up: $tgt -> $tgt.bak"
@@ -214,9 +284,8 @@ cmd_link() {
             echo "Linked: $tgt -> $file"
             ((++count))
         fi
-    done < <(find "$REPO_DIR" -type f ! -path '*/.git/*' ! -name "$SCRIPT_NAME" ! -name '.dotsignore' ! -name 'README.md' -print0)
+    done
 
-    # Symlink this script into ~/.local/bin/dots
     local self_target="$HOME/.local/bin/dots"
     if ! $dry_run; then
         mkdir -p "$HOME/.local/bin"
@@ -239,32 +308,62 @@ cmd_link() {
     fi
 
     $dry_run && echo "[DRY RUN] Would create $count symlinks."
+    return 0
 }
 
 cmd_check() {
     local interactive=false
-    [[ "${1:-}" == "--interactive" || "${1:-}" == "-i" ]] && interactive=true
+    local profile_override=""
 
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --interactive|-i) interactive=true; shift ;;
+            --profile) [[ $# -ge 2 ]] && { profile_override="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
+            *) shift ;;
+        esac
+    done
+
+    load_profile
+    [[ -n "$profile_override" ]] && ACTIVE_PROFILE="$profile_override"
     load_dotsignore
 
-    local file rel tgt tgt_dir entry lt rp
+    local file rel tgt entry lt rp
     local unlinked=()
     local untracked=()
 
-    # ── List 1: non-linked files (tracked in repo but not symlinked) ──
+    # Build tracked set (shared + profile)
+    declare -A tracked
     while IFS= read -r -d '' file; do
         rel="${file#$REPO_DIR/}"
         ! should_include "$rel" && continue
-        tgt=$(to_target_path "$rel")
+        tracked["$file"]=1
+    done < <(get_shared_files)
 
+    if [[ -n "$ACTIVE_PROFILE" ]]; then
+        local prof_dir="$REPO_DIR/profiles/$ACTIVE_PROFILE"
+        while IFS= read -r -d '' file; do
+            rel="${file#$prof_dir/}"
+            ! should_include "$rel" && continue
+            tracked["$file"]=1
+        done < <(get_profile_files "$ACTIVE_PROFILE")
+    fi
+
+    # ── List 1: non-linked files (tracked in repo but not symlinked) ──
+    for file in "${!tracked[@]}"; do
+        if [[ "$file" == "$REPO_DIR/profiles/"* ]]; then
+            rel="${file#$REPO_DIR/profiles/$ACTIVE_PROFILE/}"
+        else
+            rel="${file#$REPO_DIR/}"
+        fi
+        tgt=$(to_target_path "$rel")
         if [[ -L "$tgt" ]]; then
             lt=$(readlink "$tgt")
             [[ "$lt" == "$file" ]] && continue
         fi
         unlinked+=("$rel")
-    done < <(find "$REPO_DIR" -type f ! -path '*/.git/*' ! -name "$SCRIPT_NAME" ! -name '.dotsignore' ! -name 'README.md' -print0)
+    done
 
-    # ── List 2: untracked files (in target dirs, not in repo) ──
+    # ── List 2: untracked files ──
     local -A top_targets
     local mapping tn
     for mapping in "${DIR_MAPPINGS[@]}"; do
@@ -272,16 +371,18 @@ cmd_check() {
         top_targets["$HOME/$tn"]=1
     done
 
-    # Collect subdirectories that contain tracked files (skip top-level dirs)
     declare -A target_dirs
-    while IFS= read -r -d '' file; do
-        rel="${file#$REPO_DIR/}"
-        ! should_include "$rel" && continue
+    for file in "${!tracked[@]}"; do
+        if [[ "$file" == "$REPO_DIR/profiles/"* ]]; then
+            rel="${file#$REPO_DIR/profiles/$ACTIVE_PROFILE/}"
+        else
+            rel="${file#$REPO_DIR/}"
+        fi
         tgt=$(to_target_path "$rel")
         tgt_dir=$(dirname "$tgt")
         [[ -n "${top_targets[$tgt_dir]:-}" ]] && continue
         target_dirs["$tgt_dir"]=1
-    done < <(find "$REPO_DIR" -type f ! -path '*/.git/*' ! -name "$SCRIPT_NAME" ! -name '.dotsignore' ! -name 'README.md' -print0)
+    done
 
     local -A seen
     local dir d
@@ -295,19 +396,21 @@ cmd_check() {
             while IFS= read -r -d '' entry; do
                 [[ -f "$entry" || -L "$entry" ]] || continue
 
-                # Symlink into the repo ➜ tracked
                 if [[ -L "$entry" ]]; then
                     lt=$(readlink "$entry")
                     [[ "$lt" == "$REPO_DIR"* ]] && continue
                 fi
 
-                # Corresponding repo file exists ➜ tracked
                 rp=$(to_repo_path "$entry")
-                [[ -f "$REPO_DIR/$rp" ]] && continue
+                # Check both shared and current profile directories
+                if [[ -f "$REPO_DIR/$rp" ]]; then
+                    continue
+                fi
+                if [[ -n "$ACTIVE_PROFILE" && -f "$REPO_DIR/profiles/$ACTIVE_PROFILE/$rp" ]]; then
+                    continue
+                fi
 
-                # Check if ignored via .dotsignore
                 is_ignored "$entry" "$rp" && continue
-
                 untracked+=("$entry")
             done < <(find "$d" -maxdepth 1 \( -type f -o -type l \) -print0 2>/dev/null)
         done < <(find "$dir" -type d -print0 2>/dev/null)
@@ -344,13 +447,23 @@ cmd_check() {
 }
 
 cmd_add() {
-    local target_file="$1"
+    local target_file=""
+    local profile_name=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --profile) [[ $# -ge 2 ]] && { profile_name="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
+            --) shift; target_file="$1"; shift ;;
+            *)  target_file="$1"; shift ;;
+        esac
+    done
+
+    [[ -z "$target_file" ]] && { echo "Error: add requires a file path." >&2; exit 1; }
     [[ -f "$target_file" || -L "$target_file" ]] || {
         echo "Error: $target_file does not exist." >&2
         exit 1
     }
 
-    # Bail if already managed
     if [[ -L "$target_file" ]]; then
         local real_f
         real_f=$(readlink -f "$target_file")
@@ -362,7 +475,12 @@ cmd_add() {
 
     local repo_rel repo_full
     repo_rel=$(to_repo_path "$target_file")
-    repo_full="$REPO_DIR/$repo_rel"
+
+    if [[ -n "$profile_name" ]]; then
+        repo_full="$REPO_DIR/profiles/$profile_name/$repo_rel"
+    else
+        repo_full="$REPO_DIR/$repo_rel"
+    fi
 
     if [[ -e "$repo_full" ]]; then
         echo "Error: $repo_full already exists." >&2
@@ -371,7 +489,6 @@ cmd_add() {
 
     mkdir -p "$(dirname "$repo_full")"
 
-    # Copy content (follow symlinks to get the actual file)
     cp "$target_file" "$repo_full"
     [[ -x "$target_file" ]] && chmod +x "$repo_full"
 
@@ -381,10 +498,19 @@ cmd_add() {
 }
 
 cmd_ignore() {
-    local raw_path="${1:-}"
+    local raw_path=""
+    local profile_name=""
+
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --profile) [[ $# -ge 2 ]] && { profile_name="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
+            --) shift; raw_path="$1"; shift ;;
+            *)  raw_path="$1"; shift ;;
+        esac
+    done
+
     [[ -z "$raw_path" ]] && { echo "Error: ignore requires a file path." >&2; exit 1; }
 
-    # Expand ~ explicitly, resolve directory but not the final component
     local expanded="${raw_path/#\~/$HOME}"
     expanded="${expanded%/}"
     local dir dir_abs base abs_path
@@ -403,7 +529,24 @@ cmd_ignore() {
 
     local home_rel="${abs_path#$HOME/}"
 
-    load_dotsignore
+    local ignore_file="$DOTSIGNORE_FILE"
+    if [[ -n "$profile_name" ]]; then
+        ignore_file="$REPO_DIR/profiles/$profile_name/.dotsignore"
+        [[ -d "$(dirname "$ignore_file")" ]] || mkdir -p "$(dirname "$ignore_file")"
+    fi
+
+    # Load relevant ignores for duplicate check
+    DOTSIGNORE_PATHS=()
+    if [[ -f "$ignore_file" ]]; then
+        local line
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            line="${line%%#*}"
+            line="${line#"${line%%[![:space:]]*}"}"
+            line="${line%"${line##*[![:space:]]}"}"
+            [[ -z "$line" ]] && continue
+            DOTSIGNORE_PATHS+=("$line")
+        done < "$ignore_file"
+    fi
 
     local pattern
     for pattern in "${DOTSIGNORE_PATHS[@]}"; do
@@ -413,17 +556,19 @@ cmd_ignore() {
         }
     done
 
-    if [[ -f "$DOTSIGNORE_FILE" ]]; then
-        local last_char
-        last_char="$(tail -c 1 "$DOTSIGNORE_FILE")"
-        [[ "$last_char" != $'\n' ]] && printf '\n' >> "$DOTSIGNORE_FILE"
+    if [[ -f "$ignore_file" ]]; then
+        local file_end
+        file_end="$(tail -c 1 "$ignore_file"; echo x)"
+        file_end="${file_end%x}"
+        [[ "$file_end" == $'\n' ]] || printf '\n' >> "$ignore_file"
     fi
-    echo "$home_rel" >> "$DOTSIGNORE_FILE"
+    echo "$home_rel" >> "$ignore_file"
     echo "Added to .dotsignore: $home_rel"
 }
 
 cmd_unlink() {
     local dry_run=false restore=false
+
     for arg in "$@"; do
         case "$arg" in
             --dry-run) dry_run=true ;;
@@ -432,11 +577,15 @@ cmd_unlink() {
     done
 
     local count=0 file rel tgt cur bak
+    declare -A seen_targets
+
+    # Shared files
     while IFS= read -r -d '' file; do
         rel="${file#$REPO_DIR/}"
         ! should_include "$rel" && continue
-
         tgt=$(to_target_path "$rel")
+        [[ -n "${seen_targets[$tgt]:-}" ]] && continue
+        seen_targets["$tgt"]=1
 
         [[ -L "$tgt" ]] || continue
         cur=$(readlink "$tgt")
@@ -465,21 +614,117 @@ cmd_unlink() {
             echo "Removed: $tgt"
         fi
         ((++count))
-    done < <(find "$REPO_DIR" -type f ! -path '*/.git/*' ! -name "$SCRIPT_NAME" ! -name '.dotsignore' ! -name 'README.md' -print0)
+    done < <(get_shared_files)
+
+    # All profiles
+    if [[ -d "$REPO_DIR/profiles" ]]; then
+        local prof profile_dir
+        while IFS= read -r -d '' prof; do
+            profile_dir="$(basename "$prof")"
+            while IFS= read -r -d '' file; do
+                rel="${file#$prof/}"
+                ! should_include "$rel" && continue
+                tgt=$(to_target_path "$rel")
+                [[ -n "${seen_targets[$tgt]:-}" ]] && continue
+                seen_targets["$tgt"]=1
+
+                [[ -L "$tgt" ]] || continue
+                cur=$(readlink "$tgt")
+                [[ "$cur" != "$file" ]] && continue
+
+                bak="$tgt.bak"
+                has_bak=false
+                [[ -e "$bak" ]] && has_bak=true
+
+                if $dry_run; then
+                    if $has_bak && $restore; then
+                        echo "[DRY RUN] Remove $tgt, restore $bak"
+                    else
+                        echo "[DRY RUN] Remove $tgt"
+                    fi
+                    ((++count))
+                    continue
+                fi
+
+                rm "$tgt"
+
+                if $has_bak && $restore; then
+                    mv "$bak" "$tgt"
+                    echo "Restored: $tgt <- $bak"
+                else
+                    echo "Removed: $tgt"
+                fi
+                ((++count))
+            done < <(get_profile_files "$profile_dir")
+        done < <(find "$REPO_DIR/profiles" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null)
+    fi
 
     $dry_run && echo "[DRY RUN] Would remove $count symlinks."
+}
+
+cmd_profile() {
+    load_profile
+
+    local action="${1:-}"
+
+    case "$action" in
+        list)
+            echo "Available profiles:"
+            local p found=false
+            for p in "$REPO_DIR/profiles/"*/; do
+                if [[ -d "$p" ]]; then
+                    echo "  $(basename "$p")"
+                    found=true
+                fi
+            done
+            $found || echo "  (none)"
+            ;;
+        set)
+            local name="${2:-}"
+            [[ -z "$name" ]] && { echo "Error: profile set requires a name." >&2; exit 1; }
+            if [[ -d "$REPO_DIR/profiles/$name" ]]; then
+                mkdir -p "$PROFILE_DIR"
+                echo "$name" > "$PROFILE_FILE"
+                ACTIVE_PROFILE="$name"
+                echo "Switched to profile: $name"
+            else
+                echo "Error: profile '$name' not found in profiles/." >&2
+                exit 1
+            fi
+            ;;
+        unset)
+            rm -f "$PROFILE_FILE"
+            ACTIVE_PROFILE=""
+            echo "Profile unset."
+            ;;
+        "")
+            if [[ -n "$ACTIVE_PROFILE" ]]; then
+                echo "Active profile: $ACTIVE_PROFILE"
+            else
+                echo "No active profile."
+            fi
+            ;;
+        *)
+            echo "Unknown profile subcommand: $action" >&2
+            echo "Usage: $SCRIPT_NAME profile {set|list|unset}" >&2
+            exit 1
+            ;;
+    esac
 }
 
 # ─── Main ───────────────────────────────────────────────────
 
 [[ $# -lt 1 ]] && usage
 
+load_profile
+
 case "${1:-}" in
     link)   shift; cmd_link "${@:-}" ;;
     unlink) shift; cmd_unlink "${@:-}" ;;
     check)  shift; cmd_check "${@:-}" ;;
-    add)   shift; [[ $# -lt 1 ]] && { echo "Error: add requires a file path." >&2; exit 1; }; cmd_add "$@" ;;
-    ignore) shift; [[ $# -lt 1 ]] && { echo "Error: ignore requires a file path." >&2; exit 1; }; cmd_ignore "$@" ;;
+    add)    shift; cmd_add "${@:-}" ;;
+    ignore) shift; cmd_ignore "${@:-}" ;;
+    profile) shift; cmd_profile "${@:-}" ;;
     help|--help|-h) usage ;;
     *)     echo "Unknown command: $1"; usage ;;
 esac
