@@ -1,4 +1,5 @@
 {
+  "format_on_save": "on",
   "project_panel": {
     "dock": "left",
   },
@@ -13,6 +14,12 @@
   "colorize_brackets": true,
   "cli_default_open_behavior": "new_window",
   "redact_private_values": true,
+  "telemetry": {
+    "diagnostics": true,
+    "metrics": true,
+    "anthropic_retention": false,
+  },
+  "disable_ai": true,
   "theme": {
     "mode": "system",
     "light": "One Light",
