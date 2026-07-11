@@ -392,6 +392,7 @@ cmd_check() {
     local dir
     for dir in "${!target_dirs[@]}"; do
         [[ -d "$dir" ]] || continue
+        [[ "$dir" == "$HOME/.local/bin" ]] && continue
 
         while IFS= read -r -d '' entry; do
             [[ -f "$entry" || -L "$entry" ]] || continue
