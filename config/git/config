@@ -1,16 +1,19 @@
 [core]
-editor = "nvim"
+	editor = "nvim"
 
 [init]
-defaultBranch = "main"
+	defaultBranch = "main"
 
 [pull]
-rebase = true
+	rebase = true
 
 [user]
-email = "mkuritsuu@gmail.com"
-name = "mkuritsu"
-signingKey = "094F2AF25C054BDE"
+	email = "me@mkuritsu.dev"
+	name = "mkuritsu"
+	signingkey = ~/.ssh/id_ed25519.pub
 
 [commit]
-gpgSign = true
+	gpgSign = true
+
+[gpg]
+	format = ssh
