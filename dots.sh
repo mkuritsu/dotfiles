@@ -116,16 +116,19 @@ is_ignored() {
 # ─── File sources ───────────────────────────────────────────
 
 get_shared_files() {
-    find "$REPO_DIR" -type f ! -path '*/.git/*' ! -path '*/profiles/*' \
-        ! -name "$SCRIPT_NAME" ! -name '.dotsignore' \
-        ! -name 'README.md' -print0
+    local d
+    for d in config local; do
+        find "$REPO_DIR/$d" -type f -print0
+    done
 }
 
 get_profile_files() {
     local profile="$1"
-    local dir="$REPO_DIR/profiles/$profile"
-    [[ -d "$dir" ]] || return 0
-    find "$dir" -type f ! -name '.dotsignore' -print0
+    local d
+    for d in config local; do
+        local dd="$REPO_DIR/profiles/$profile/$d"
+        [[ -d "$dd" ]] && find "$dd" -type f ! -name '.dotsignore' -print0
+    done
 }
 
 # ─── OS / filtering ────────────────────────────────────────
@@ -386,36 +389,30 @@ cmd_check() {
         target_dirs["$tgt_dir"]=1
     done
 
-    local -A seen
-    local dir d
+    local dir
     for dir in "${!target_dirs[@]}"; do
         [[ -d "$dir" ]] || continue
-        while IFS= read -r -d '' d; do
-            [[ -n "${seen[$d]:-}" ]] && continue
-            [[ -n "${top_targets[$d]:-}" ]] && continue
-            seen[$d]=1
 
-            while IFS= read -r -d '' entry; do
-                [[ -f "$entry" || -L "$entry" ]] || continue
+        while IFS= read -r -d '' entry; do
+            [[ -f "$entry" || -L "$entry" ]] || continue
 
-                if [[ -L "$entry" ]]; then
-                    lt=$(readlink "$entry")
-                    [[ "$lt" == "$REPO_DIR"* ]] && continue
-                fi
+            if [[ -L "$entry" ]]; then
+                lt=$(readlink "$entry")
+                [[ "$lt" == "$REPO_DIR"* ]] && continue
+            fi
 
-                rp=$(to_repo_path "$entry")
-                # Check both shared and current profile directories
-                if [[ -f "$REPO_DIR/$rp" ]]; then
-                    continue
-                fi
-                if [[ -n "$ACTIVE_PROFILE" && -f "$REPO_DIR/profiles/$ACTIVE_PROFILE/$rp" ]]; then
-                    continue
-                fi
+            rp=$(to_repo_path "$entry")
+            # Check both shared and current profile directories
+            if [[ -f "$REPO_DIR/$rp" ]]; then
+                continue
+            fi
+            if [[ -n "$ACTIVE_PROFILE" && -f "$REPO_DIR/profiles/$ACTIVE_PROFILE/$rp" ]]; then
+                continue
+            fi
 
-                is_ignored "$entry" "$rp" && continue
-                untracked+=("$entry")
-            done < <(find "$d" -maxdepth 1 \( -type f -o -type l \) -print0 2>/dev/null)
-        done < <(find "$dir" -type d -print0 2>/dev/null)
+            is_ignored "$entry" "$rp" && continue
+            untracked+=("$entry")
+        done < <(find "$dir" -maxdepth 1 \( -type f -o -type l \) -print0 2>/dev/null)
     done
 
     # ── Output ──
