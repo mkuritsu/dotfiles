@@ -118,6 +118,10 @@ if test -f "$HOME/.vite-plus/env.fish"
     source "$HOME/.vite-plus/env.fish"
 end
 
+if test -f "$HOME/.cargo/env.fish"
+    source "$HOME/.cargo/env.fish"
+end
+
 if type -q starship
     starship init fish | source
 end
