@@ -1,4 +1,9 @@
 {
+  "diagnostics": {
+    "inline": {
+      "enabled": true,
+    },
+  },
   "format_on_save": "on",
   "project_panel": {
     "dock": "left",
