@@ -58,6 +58,8 @@ Commands:
   add <file>        Copy a file into the repo and replace it with a symlink
   ignore <path>     Resolve path and add it to .dotsignore
   profile           Manage profiles (set, list, unset)
+  diff [args]       Run git diff in the repo directory
+  status            Show git status of the repo directory
   help              Show this help message
 
 Options:
@@ -662,6 +664,14 @@ cmd_unlink() {
     $dry_run && echo "[DRY RUN] Would remove $count symlinks."
 }
 
+cmd_diff() {
+    git -C "$REPO_DIR" diff "$@"
+}
+
+cmd_status() {
+    git -C "$REPO_DIR" status
+}
+
 cmd_profile() {
     load_profile
 
@@ -725,6 +735,8 @@ case "${1:-}" in
     add)    shift; cmd_add "${@:-}" ;;
     ignore) shift; cmd_ignore "${@:-}" ;;
     profile) shift; cmd_profile "${@:-}" ;;
+    diff)    shift; cmd_diff "$@" ;;
+    status)  cmd_status ;;
     help|--help|-h) usage ;;
     *)     echo "Unknown command: $1"; usage ;;
 esac
