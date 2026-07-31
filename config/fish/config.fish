@@ -132,3 +132,5 @@ end
 if type -q opencode
     alias oc="opencode"
 end
+
+alias cf-curl="cloudflared access curl"

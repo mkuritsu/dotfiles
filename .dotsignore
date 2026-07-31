@@ -7,3 +7,4 @@
 .config/fish/conf.d/vite-plus.fish
 .config/fish/conf.d/rustup.fish
 .config/fish/conf.d/ssh-askpass.fish
+.config/herdr/.plugins.lock

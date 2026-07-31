@@ -1,4 +1,5 @@
 {
+  "diff_view_style": "split",
   "diagnostics": {
     "inline": {
       "enabled": true,
@@ -11,8 +12,8 @@
   "vim_mode": true,
   "helix_mode": false,
   "base_keymap": "VSCode",
-  "ui_font_size": 16,
-  "buffer_font_size": 14,
+  "ui_font_size": 15,
+  "buffer_font_size": 13,
   "buffer_font_features": {
     "calt": false,
   },
@@ -20,8 +21,8 @@
   "cli_default_open_behavior": "new_window",
   "redact_private_values": true,
   "telemetry": {
-    "diagnostics": true,
-    "metrics": true,
+    "diagnostics": false,
+    "metrics": false,
     "anthropic_retention": false,
   },
   "disable_ai": true,

@@ -120,7 +120,14 @@ require("blink.cmp").setup({
 })
 
 -- Navigation
-require("snacks").setup({})
+require("snacks").setup({
+	picker = {
+		sources = {
+			files = { follow = true },
+			grep = { follow = true },
+		},
+	},
+})
 require("oil").setup({
 	default_file_explorer = true,
 	view_options = {
@@ -163,7 +170,7 @@ require("lualine").setup({
 require("fidget").setup({})
 
 require("catppuccin").setup({
-	flavour = "mocha",
+	flavour = "macchiato",
 	transparent_background = false,
 	float = {
 		transparent = true,
