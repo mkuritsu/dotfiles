@@ -1,0 +1,8 @@
+{
+  "app.thinking.cycle": ["shift+tab"],
+  "app.thinking.toggle": [],
+  "app.tree.filter.noTools": [],
+  "app.model.cycleForward": "alt+p",
+  "app.session.togglePath": "alt+p",
+  "app.models.toggleProvider": "alt+p"
+}

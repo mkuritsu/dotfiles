@@ -22,6 +22,7 @@ SCRIPT_NAME="$(basename "$(resolve_link "$0")")"
 DIR_MAPPINGS=(
     "config:.config"
     "local:.local"
+    "pi:.pi"
 )
 
 # Linux-only directories (relative to repo root)
@@ -116,17 +117,19 @@ is_ignored() {
 # ─── File sources ───────────────────────────────────────────
 
 get_shared_files() {
-    local d
-    for d in config local; do
-        find "$REPO_DIR/$d" -type f -print0
+    local mapping d
+    for mapping in "${DIR_MAPPINGS[@]}"; do
+        d="${mapping%%:*}"
+        [[ -d "$REPO_DIR/$d" ]] && find "$REPO_DIR/$d" -type f -print0
     done
 }
 
 get_profile_files() {
     local profile="$1"
-    local d
-    for d in config local; do
-        local dd="$REPO_DIR/profiles/$profile/$d"
+    local mapping d dd
+    for mapping in "${DIR_MAPPINGS[@]}"; do
+        d="${mapping%%:*}"
+        dd="$REPO_DIR/profiles/$profile/$d"
         [[ -d "$dd" ]] && find "$dd" -type f ! -name '.dotsignore' -print0
     done
 }
