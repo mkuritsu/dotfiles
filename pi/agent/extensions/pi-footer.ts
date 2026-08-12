@@ -3,7 +3,7 @@
  *
  * Shows the active model, thinking level, context/cost information, current
  * directory, and git status in Pi's footer. The prompt editor is also given a
- * wider layout with a bold border.
+ * wider layout with a bold border and a Claude Code-style prompt arrow.
  */
 
 import { basename } from "node:path";
@@ -130,15 +130,18 @@ function isEditorBorderLine(text: string): boolean {
 
 class MarginedEditor extends CustomEditor {
 	private readonly fixedBorder: (text: string) => string;
+	private readonly promptPrefix: string;
 
 	constructor(
 		tui: TUI,
 		theme: EditorTheme,
 		keybindings: KeybindingsManager,
 		fixedBorder: (text: string) => string,
+		promptPrefix: string,
 	) {
 		super(tui, theme, keybindings, { paddingX: 0 });
 		this.fixedBorder = fixedBorder;
+		this.promptPrefix = promptPrefix;
 	}
 
 	render(width: number): string[] {
@@ -152,11 +155,15 @@ class MarginedEditor extends CustomEditor {
 		const margin = Math.min(2, Math.floor((width - 3) / 2));
 		const insideWidth = Math.max(1, width - margin * 2 - 2);
 		const padding = " ".repeat(margin);
+		const promptWidth = visibleWidth(this.promptPrefix);
+		const editorWidth = Math.max(1, insideWidth - promptWidth);
 
 		// Pi normally replaces this border with a thinking-level color. Set it
 		// immediately before rendering so the prompt bar always stays bold.
 		this.borderColor = this.fixedBorder;
-		const lines = super.render(insideWidth);
+		// Reserve space for the prompt arrow while laying out text so wrapping
+		// and the hardware cursor remain aligned with the rendered input.
+		const lines = super.render(editorWidth);
 		if (lines.length === 0) return lines;
 
 		let bottomIndex = lines.length - 1;
@@ -166,16 +173,24 @@ class MarginedEditor extends CustomEditor {
 		}
 
 		const border = (text: string) => this.fixedBorder(text);
+		const fitInside = (line: string): string => {
+			const fitted = truncateToWidth(line, insideWidth, "");
+			return `${fitted}${" ".repeat(Math.max(0, insideWidth - visibleWidth(fitted)))}`;
+		};
 		// Unicode has no heavy rounded-corner glyphs, so use the matching heavy
 		// box-drawing corners to keep every border segment the same thickness.
 		const top = `${padding}${border(`┏${"━".repeat(insideWidth)}┓`)}${padding}`;
 		const bottom = `${padding}${border(`┗${"━".repeat(insideWidth)}┛`)}${padding}`;
+		const continuationPrefix = " ".repeat(promptWidth);
 
 		return lines.map((line, index) => {
 			if (index === 0) return top;
 			if (index === bottomIndex) return bottom;
-			if (index > bottomIndex) return `${padding}${line}${padding}`;
-			return `${padding}${border("┃")}${line}${border("┃")}${padding}`;
+			if (index > bottomIndex) return `${padding}${fitInside(line)}${padding}`;
+
+			const prefix = index === 1 ? this.promptPrefix : continuationPrefix;
+			const content = fitInside(`${prefix}${line}`);
+			return `${padding}${border("┃")}${content}${border("┃")}${padding}`;
 		});
 	}
 }
@@ -297,7 +312,8 @@ export default function (pi: ExtensionAPI): void {
 		ctx.ui.setEditorComponent((tui, editorTheme, keybindings) => {
 			activeTui = tui;
 			const boldBorder = (text: string) => ctx.ui.theme.bold(ctx.ui.theme.fg("text", text));
-			return new MarginedEditor(tui, editorTheme, keybindings, boldBorder);
+			const promptPrefix = `${ctx.ui.theme.bold(ctx.ui.theme.fg("text", "❯"))} `;
+			return new MarginedEditor(tui, editorTheme, keybindings, boldBorder, promptPrefix);
 		});
 	});
 

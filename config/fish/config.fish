@@ -115,7 +115,6 @@ set -x BUN_INSTALL "$HOME/.bun"
 # SOURCE
 ##############
 if test -f "$HOME/.vite-plus/env.fish"
-    source "$HOME/.vite-plus/env.fish"
 end
 
 if test -f "$HOME/.cargo/env.fish"
@@ -134,3 +133,15 @@ if type -q opencode
 end
 
 alias cf-curl="cloudflared access curl"
+
+
+set -x SSH_AUTH_SOCK "/run/user/1000/keyring/ssh"
+
+# if status is-interactive
+#     keychain --quiet --eval id_ed25519 | source
+# end
+
+# Added by LM Studio CLI (lms)
+set -gx PATH $PATH /home/kuritsu/.lmstudio/bin
+# End of LM Studio CLI section
+

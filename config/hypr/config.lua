@@ -28,12 +28,27 @@ hl.config({
 	},
 
 	group = {
+		col = {
+			border_active = "rgb(295675)",
+		},
+
 		groupbar = {
 			enabled = true,
 			gradients = true,
-			height = 12,
-			font_size = 11,
-			font_family = "JetBrainsMonoNL Nerd Font",
+			height = 20,
+			font_size = 12,
+			indicator_gap = 0,
+			indicator_height = 0,
+			gradient_rounding = 0,
+			gaps_out = 0,
+			gaps_in = 0,
+			font_family = "JetBrainsMono",
+			font_weight_active = "semibold",
+			font_weight_inactive = "semibold",
+			col = {
+				active = "rgb(295675)",
+				inactive = "rgb(222222)",
+			},
 		},
 	},
 })

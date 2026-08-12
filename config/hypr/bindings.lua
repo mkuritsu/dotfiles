@@ -1,7 +1,7 @@
 local mainMod = "SUPER"
 
 local terminal = "ghostty"
-local fileManager = "dolphin"
+local fileManager = "nautilus"
 local launcher = "vicinae toggle"
 local lockScreen = "loginctl lock-session"
 
@@ -27,7 +27,6 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind("ALT + SPACE", hl.dsp.exec_cmd(launcher))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + O", hl.dsp.exec_cmd("dms ipc call hypr openOverview"))
 hl.bind(mainMod .. " + P", function()
 	-- https://wiki.hypr.land/Configuring/Advanced-and-Cool/Uncommon-tips-and-tricks/#per-workspace-layouts
 	local workspace = get_active_workspace()
@@ -53,15 +52,15 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + B", hl.dsp.layout("togglesplit"))
 
 hl.bind(mainMod .. " + SHIFT + E", function()
-	if IsUWSMActive() then
+	if os.getenv("UWSM_WAIT_VARNAMES") then
 		hl.exec_cmd("uwsm stop")
 	else
 		hl.dispatch(hl.dsp.exit())
 	end
 end)
 
-hl.bind("Print", hl.dsp.exec_cmd("$XDG_CONFIG_HOME/hypr/scripts/screenshot.sh area"))
-hl.bind("ALT+Print", hl.dsp.exec_cmd("$XDG_CONFIG_HOME/hypr/scripts/screenshot.sh monitor"))
+hl.bind("Print", hl.dsp.exec_cmd("noctalia msg screenshot-region"))
+hl.bind("ALT+Print", hl.dsp.exec_cmd("noctalia msg screenshot-fullscreen"))
 
 hl.bind(mainMod .. " + F10", hl.dsp.exec_cmd(lockScreen))
 hl.bind(mainMod .. " + Y", hl.dsp.exec_cmd("hyprpicker --lowercase-hex --autocopy"))
@@ -115,9 +114,39 @@ local focus_binds = {
 	right = { "right", "l" },
 }
 
+local function focus_or_switch_group(direction)
+	return function()
+		local active_window = hl.get_active_window()
+		local group = active_window and active_window.group
+		if group then
+			local current_index = group.current_index
+			local group_size = group.size
+			local can_switch_tab =
+				(direction == "left" and current_index > 1)
+				or (direction == "right" and current_index < group_size)
+
+			if can_switch_tab then
+				if direction == "left" then
+					hl.dispatch(hl.dsp.group.prev())
+				else
+					hl.dispatch(hl.dsp.group.next())
+				end
+				return
+			end
+		end
+
+		hl.dispatch(hl.dsp.focus({ direction = direction }))
+	end
+end
+
 for dir, binds in pairs(focus_binds) do
 	for _, bind in ipairs(binds) do
-		hl.bind(mainMod .. " + " .. bind, hl.dsp.focus({ direction = dir }))
+		local focus = hl.dsp.focus({ direction = dir })
+		if dir == "left" or dir == "right" then
+			focus = focus_or_switch_group(dir)
+		end
+
+		hl.bind(mainMod .. " + " .. bind, focus)
 		hl.bind(mainMod .. " + SHIFT + " .. bind, hl.dsp.window.move({ direction = dir }))
 	end
 end

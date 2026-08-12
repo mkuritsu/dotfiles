@@ -1,4 +1,4 @@
-if not IsUWSMActive() then
+if not os.getenv("UWSM_WAIT_VARNAMES") then
 	hl.env("XCURSOR_SIZE", "24")
 	hl.env("XCURSOR_THEME", "Adwaita")
 	hl.env("ELECTRON_OZONE_PLATFORM_HINT", "wayland")
