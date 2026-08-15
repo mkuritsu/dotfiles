@@ -125,23 +125,15 @@ if type -q starship
     starship init fish | source
 end
 
+if type -q mise
+	mise activate fish | source
+end
+
 ##############
 # ALIASES
 ##############
-if type -q opencode
-    alias oc="opencode"
-end
 
 alias cf-curl="cloudflared access curl"
 
-
 set -x SSH_AUTH_SOCK "/run/user/1000/keyring/ssh"
-
-# if status is-interactive
-#     keychain --quiet --eval id_ed25519 | source
-# end
-
-# Added by LM Studio CLI (lms)
-set -gx PATH $PATH /home/kuritsu/.lmstudio/bin
-# End of LM Studio CLI section
 

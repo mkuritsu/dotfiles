@@ -25,7 +25,7 @@ end
 -- Misc binds
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(terminal))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
-hl.bind("ALT + SPACE", hl.dsp.exec_cmd(launcher))
+hl.bind(mainMod .. " + SPACE", hl.dsp.exec_cmd(launcher))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + P", function()
 	-- https://wiki.hypr.land/Configuring/Advanced-and-Cool/Uncommon-tips-and-tricks/#per-workspace-layouts
@@ -66,7 +66,7 @@ hl.bind(mainMod .. " + F10", hl.dsp.exec_cmd(lockScreen))
 hl.bind(mainMod .. " + Y", hl.dsp.exec_cmd("hyprpicker --lowercase-hex --autocopy"))
 
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
-hl.bind(mainMod .. " + M", hl.dsp.window.fullscreen({ mode = "maximized" }))
+hl.bind(mainMod .. " + SHIFT + F", hl.dsp.window.fullscreen({ mode = "maximized" }))
 
 -- MEDIA
 hl.bind("XF86AudioRaiseVolume", hl.dsp.exec_cmd("wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"), { locked = true, repeating = true })
@@ -121,9 +121,7 @@ local function focus_or_switch_group(direction)
 		if group then
 			local current_index = group.current_index
 			local group_size = group.size
-			local can_switch_tab =
-				(direction == "left" and current_index > 1)
-				or (direction == "right" and current_index < group_size)
+			local can_switch_tab = (direction == "left" and current_index > 1) or (direction == "right" and current_index < group_size)
 
 			if can_switch_tab then
 				if direction == "left" then

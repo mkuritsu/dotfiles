@@ -35,13 +35,18 @@ local grammars =
 	{ "lua", "rust", "c", "cpp", "java", "python", "bash", "fish", "nix", "json", "yaml", "just", "dockerfile", "toml" }
 
 local lsps = {
-	-- clangd and rust-analyzer installed through package-manager/rustup
+	-- C/C++
+	"clangd",
+	-- "clang-format",
+
+	-- Rust
+	-- "rust-analyzer",
 
 	-- Lua
 	"stylua",
 	"lua_ls",
 
-	-- JS/Ts
+	-- JS/TS
 	"ts_ls",
 	"oxfmt",
 	"oxlint",
@@ -56,6 +61,12 @@ local lsps = {
 
 	-- Java
 	"jdtls",
+
+	-- Go
+	"gopls",
+
+	-- Zig
+	"zls",
 
 	-- Misc
 	"bashls",
