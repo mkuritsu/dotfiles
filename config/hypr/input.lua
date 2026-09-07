@@ -6,7 +6,7 @@ hl.config({
 		accel_profile = "flat",
 		sensitivity = 0,
 		repeat_rate = 40,
-		repeat_delay = 200,
+		repeat_delay = 220,
 
 		touchpad = {
 			natural_scroll = true,

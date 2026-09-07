@@ -1,8 +1,8 @@
 -- Utility functions
 local function set_textobject_keymap(keymap, selection)
-	vim.keymap.set("v", keymap, function()
-		require("nvim-treesitter-textobjects.select").select_textobject(selection, "textobjects")
-	end)
+    vim.keymap.set("v", keymap, function()
+        require("nvim-treesitter-textobjects.select").select_textobject(selection, "textobjects")
+    end)
 end
 
 -- Textobjects
@@ -14,16 +14,16 @@ set_textobject_keymap("as", "@local.scope")
 
 -- Snacks picker
 vim.keymap.set("n", "<leader>f", function()
-	Snacks.picker.files()
+    Snacks.picker.files()
 end, { desc = "Find files" })
 vim.keymap.set("n", "<leader>g", function()
-	Snacks.picker.grep()
+    Snacks.picker.grep()
 end, { desc = "Live grep" })
 vim.keymap.set("n", "<leader>b", function()
-	Snacks.picker.buffers()
+    Snacks.picker.buffers()
 end, { desc = "Buffers" })
 vim.keymap.set("n", "<leader>tds", function()
-	Snacks.picker.grep({ pattern = "TODO|FIXME|HACK|WARN|PERF|NOTE" })
+    Snacks.picker.grep({ pattern = "TODO|FIXME|HACK|WARN|PERF|NOTE" })
 end, { desc = "Todo comments" })
 
 -- Normify
@@ -41,7 +41,7 @@ vim.keymap.set("v", "<leader>y", '"+y', { desc = "Yank selection to system clipb
 vim.keymap.set("n", "<leader>-", "<CMD>Oil<CR>", { desc = "Open Oil" })
 vim.keymap.set("n", "grd", vim.lsp.buf.definition, { desc = "go to definitions" })
 vim.keymap.set("n", "s", function()
-	require("flash").jump()
+    require("flash").jump()
 end)
 
 -- Other

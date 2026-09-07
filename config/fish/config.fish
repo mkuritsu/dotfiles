@@ -5,7 +5,7 @@ function fish_greeting
 end
 
 function cd_fzf
-    set lookup_dirs ~/ .
+    set lookup_dirs
     if test -d ~/Dev
         set lookup_dirs $lookup_dirs ~/Dev
     end
@@ -115,6 +115,7 @@ set -x BUN_INSTALL "$HOME/.bun"
 # SOURCE
 ##############
 if test -f "$HOME/.vite-plus/env.fish"
+    source "$HOME/.config/vite-plus/env.fish"
 end
 
 if test -f "$HOME/.cargo/env.fish"
@@ -134,6 +135,3 @@ end
 ##############
 
 alias cf-curl="cloudflared access curl"
-
-set -x SSH_AUTH_SOCK "/run/user/1000/keyring/ssh"
-

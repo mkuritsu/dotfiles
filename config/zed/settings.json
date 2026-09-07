@@ -1,8 +1,6 @@
 {
-  "icon_theme": {
-    "mode": "dark",
-    "light": "Zed (Default)",
-    "dark": "Zed (Default)"
+  "minimap": {
+    "show": "auto",
   },
   "diff_view_style": "split",
   "diagnostics": {
@@ -14,7 +12,7 @@
   "project_panel": {
     "dock": "left",
   },
-  "vim_mode": false,
+  "vim_mode": true,
   "helix_mode": false,
   "base_keymap": "VSCode",
   "ui_font_size": 15,
@@ -33,7 +31,7 @@
   "disable_ai": true,
   "theme": {
     "mode": "dark",
-    "light": "Gruvbox Light Hard",
+    "light": "One Light",
     "dark": "VSCode 2026 Dark",
   },
 }
