@@ -1,4 +1,21 @@
 {
+  "buffer_font_size": 13.0,
+  "terminal": {},
+  "agent": {
+    "dock": "left",
+    "favorite_models": [],
+    "model_parameters": []
+  },
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)",
+  },
+  "theme": {
+    "mode": "dark",
+    "light": "One Light",
+    "dark": "Cursor Dark",
+  },
   "minimap": {
     "show": "auto",
   },
@@ -12,11 +29,10 @@
   "project_panel": {
     "dock": "left",
   },
-  "vim_mode": true,
+  "vim_mode": false,
   "helix_mode": false,
   "base_keymap": "VSCode",
   "ui_font_size": 15,
-  "buffer_font_size": 13,
   "buffer_font_features": {
     "calt": false,
   },
@@ -27,11 +43,5 @@
     "diagnostics": false,
     "metrics": false,
     "anthropic_retention": false,
-  },
-  "disable_ai": true,
-  "theme": {
-    "mode": "dark",
-    "light": "One Light",
-    "dark": "VSCode 2026 Dark",
   },
 }

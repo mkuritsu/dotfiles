@@ -37,31 +37,6 @@ function worktree_fzf
 end
 bind ctrl-t worktree_fzf
 
-function project_worktree_fzf
-    if not test -d ~/Dev
-        echo "~/Dev does not exist"
-        return
-    end
-    set project $(find ~/Dev -mindepth 1 -maxdepth 1 \( -type d -o -type l \) ! -path "*/Dev/worktrees" | fzf)
-    if test -z "$project"
-        return
-    end
-    if not git -C $project rev-parse --is-inside-work-tree >/dev/null 2>&1
-        echo "$project is not a git repository"
-        return
-    end
-    set project_name $(basename $project)
-    set dir $(begin
-        git -C $project worktree list | awk '{print $1}'
-        find ~/Dev/worktrees -mindepth 1 -maxdepth 1 -type d -name "$project_name-*" 2>/dev/null
-    end | sort -u | fzf)
-    if test -n "$dir"
-        cd $dir
-        commandline -f repaint
-    end
-end
-bind ctrl-g project_worktree_fzf
-
 function worktree
     set branch $argv[1]
     set dirname $argv[2]
@@ -101,15 +76,15 @@ fish_add_path "$HOME/.cache/.bun/bin"
 fish_add_path "$HOME/.bun/bin"
 fish_add_path "$HOME/.go/bin"
 fish_add_path "$HOME/.cargo/bin"
-if test (uname) = Linux
-    fish_add_path "/home/linuxbrew/.linuxbrew/bin"
-end
+fish_add_path "$HOME/.opencode/bin"
+fish_add_path "$HOME/.grok/bin"
 
 ##############
 # VARS
 ##############
-set -x GOPATH "$HOME/.go" # so go does not polute my home dir
-set -x BUN_INSTALL "$HOME/.bun"
+set -gx GOPATH "$HOME/.go" # so go does not polute my home dir
+set -gx BUN_INSTALL "$HOME/.bun"
+set -gx EDITOR "nvim"
 
 ##############
 # SOURCE

@@ -2,7 +2,6 @@
 
 add_newline = false
 format = '$container$nix_shell$username$directory$git_branch$character'
-line_break = false
 
 [character]
 error_symbol = "[~>](red)"
