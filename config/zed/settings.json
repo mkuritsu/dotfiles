@@ -1,47 +1,26 @@
 {
+  "diff_view_style": "split",
+  "format_on_save": "on",
+  "vim_mode": false,
+  "helix_mode": false,
+  "base_keymap": "VSCode",
+  "ui_font_size": 15,
+  "colorize_brackets": true,
+  "cli_default_open_behavior": "new_window",
+  "redact_private_values": true,
   "buffer_font_size": 13.0,
-  "terminal": {},
-  "agent": {
-    "dock": "left",
-    "favorite_models": [],
-    "model_parameters": []
-  },
-  "icon_theme": {
-    "mode": "dark",
-    "light": "Zed (Default)",
-    "dark": "Zed (Default)",
-  },
-  "theme": {
-    "mode": "dark",
-    "light": "One Light",
-    "dark": "Cursor Dark",
+  "buffer_font_features": {
+    "calt": false,
   },
   "minimap": {
     "show": "auto",
   },
-  "diff_view_style": "split",
   "diagnostics": {
     "inline": {
       "enabled": true,
     },
   },
-  "format_on_save": "on",
   "project_panel": {
     "dock": "left",
-  },
-  "vim_mode": false,
-  "helix_mode": false,
-  "base_keymap": "VSCode",
-  "ui_font_size": 15,
-  "buffer_font_features": {
-    "calt": false,
-  },
-  "colorize_brackets": true,
-  "cli_default_open_behavior": "new_window",
-  "redact_private_values": true,
-  "telemetry": {
-    "diagnostics": false,
-    "metrics": false,
-    "anthropic_retention": false,
   },
 }
