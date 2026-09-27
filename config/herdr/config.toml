@@ -1,4 +1,4 @@
 onboarding = false
 
 [keys]
-prefix = "ctrl+;"
+prefix = "ctrl+a"

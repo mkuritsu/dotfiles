@@ -4,69 +4,97 @@
 function fish_greeting
 end
 
-function cd_fzf
-    set lookup_dirs
-    if test -d ~/Dev
-        set lookup_dirs $lookup_dirs ~/Dev
+# Paths of all worktrees of the current repo, main checkout first
+function __git_worktrees
+    git worktree list --porcelain 2>/dev/null | string replace -rf '^worktree ' ''
+end
+
+# Path of the worktree that has branch $argv[1] checked out, if any
+function __git_branch_worktree -a branch
+    set -l wt
+    for line in (git worktree list --porcelain 2>/dev/null)
+        switch $line
+            case 'worktree *'
+                set wt (string replace 'worktree ' '' -- $line)
+            case "branch refs/heads/$branch"
+                echo $wt
+                return 0
+        end
     end
-    if test -d ~/Projects
-        set lookup_dirs $lookup_dirs ~/Projects/
+    return 1
+end
+
+function cd_fzf -d "Pick a project in ~/Dev or ~/Projects with fzf and cd into it"
+    set -l lookup_dirs (path filter -d ~/Dev ~/Projects)
+    if test (count $lookup_dirs) -eq 0
+        echo "cd_fzf: neither ~/Dev nor ~/Projects exists" >&2
+        commandline -f repaint
+        return 1
     end
-    set dir $(find $lookup_dirs -mindepth 1 -maxdepth 1 -type d -o -type l | fzf)
+    # -L so symlinks to directories are listed (and symlinks to files are not)
+    set -l dir (find -L $lookup_dirs -mindepth 1 -maxdepth 1 -type d 2>/dev/null | fzf)
     if test -n "$dir"
         cd $dir
-        commandline -f repaint
     end
+    commandline -f repaint
 end
 bind ctrl-f cd_fzf
 
-function worktree_fzf
-    if not git rev-parse --is-inside-work-tree >/dev/null 2>&1
-        echo "not inside a git repository"
-        return
+function worktree_fzf -d "Pick a worktree of the current git repo with fzf and cd into it"
+    set -l worktrees (__git_worktrees)
+    if test (count $worktrees) -eq 0
+        echo "worktree_fzf: not inside a git repository" >&2
+        commandline -f repaint
+        return 1
     end
-    set project $(basename $(dirname $(realpath $(git rev-parse --git-common-dir))))
-    set dir $(begin
-        git worktree list | awk '{print $1}'
-        find ~/Dev/worktrees -mindepth 1 -maxdepth 1 -type d -name "$project-*" 2>/dev/null
-    end | sort -u | fzf)
+    # path filter drops worktrees whose directory was deleted but not pruned
+    set -l dir (path filter -d $worktrees | fzf)
     if test -n "$dir"
         cd $dir
-        commandline -f repaint
     end
+    commandline -f repaint
 end
 bind ctrl-t worktree_fzf
 
-function worktree
-    set branch $argv[1]
-    set dirname $argv[2]
-    if test -z "$branch"
-        echo "usage: worktree <branch> [dirname]"
+function worktree -d "Create a worktree for a branch in ~/Dev/worktrees (or jump to it) and cd into it"
+    set -l branch $argv[1]
+    set -l name $argv[2]
+    if test -z "$branch"; or test (count $argv) -gt 2
+        echo "usage: worktree <branch> [dirname]" >&2
         return 1
     end
-    if test -z "$dirname"
-        set dirname $branch
-    end
-    if not git rev-parse --is-inside-work-tree >/dev/null 2>&1
-        echo "not inside a git repository"
+    set -l main (__git_worktrees)[1]
+    if test -z "$main"
+        echo "worktree: not inside a git repository" >&2
         return 1
     end
-    set repo_root $(dirname $(realpath $(git rev-parse --git-common-dir)))
-    set project $(basename $repo_root)
-    set dest ~/Dev/worktrees/$project-$dirname
-    if not test -d $dest
-        mkdir -p $(dirname $dest)
+
+    # Branch already checked out somewhere (git refuses a second checkout): go there
+    set -l dest (__git_branch_worktree $branch)
+    if test -z "$dest"
+        # "feature/foo" -> "feature-foo" so the worktree dir is not nested
+        test -n "$name"; or set name (string replace -a / - -- $branch)
+        set dest ~/Dev/worktrees/(path basename $main)-$name
+        if test -e $dest
+            echo "worktree: $dest already exists but is not a worktree for $branch" >&2
+            return 1
+        end
+        mkdir -p (path dirname $dest); or return 1
+        # A local branch, or a remote-only one (git creates a tracking branch)
         if git show-ref --verify --quiet refs/heads/$branch
-            git worktree add $dest $branch
+            or test -n "$(git for-each-ref --count=1 "refs/remotes/*/$branch")"
+            git worktree add $dest $branch; or return 1
         else
-            git worktree add -b $branch $dest
+            git worktree add -b $branch $dest; or return 1
         end
     end
-    if test -d $dest
-        cd $dest
-        commandline -f repaint
-    end
+    cd $dest
+    commandline -f repaint
 end
+complete -c worktree -f -n '__fish_is_nth_token 1' -a '(
+    git for-each-ref --format="%(refname:lstrip=2)" refs/heads 2>/dev/null
+    git for-each-ref --format="%(refname:lstrip=3)" refs/remotes 2>/dev/null | string match -v HEAD
+)'
 
 ##############
 # PATH
@@ -89,7 +117,7 @@ set -gx EDITOR "nvim"
 ##############
 # SOURCE
 ##############
-if test -f "$HOME/.vite-plus/env.fish"
+if test -f "$HOME/.config/vite-plus/env.fish"
     source "$HOME/.config/vite-plus/env.fish"
 end
 
@@ -108,5 +136,4 @@ end
 ##############
 # ALIASES
 ##############
-
 alias cf-curl="cloudflared access curl"

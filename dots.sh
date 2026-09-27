@@ -1,5 +1,80 @@
 #!/usr/bin/env bash
+#
+# dots - manage this dotfiles repo by symlinking its files into $HOME
+#
+# Every file under the repo's top-level directories is symlinked, one file at
+# a time (never whole directories), to the matching path in $HOME:
+#   config/  -> ~/.config/
+#   local/   -> ~/.local/
+#   pi/      -> ~/.pi/
+# Paths listed in LINUX_ONLY_PATHS (config/hypr, config/uwsm, config/vicinae)
+# are only linked on Linux. `link` also installs this script as
+# ~/.local/bin/dots, so after the first run it can be called as `dots`.
+#
+# Profiles: machine-specific files live in profiles/<name>/ with the same
+# layout (e.g. profiles/work/config/git/config). The active profile's files are
+# linked on top of the shared ones and win when both have the same path. The
+# active profile is stored in ~/.local/state/dots/profile; the DOTS_PROFILE
+# environment variable overrides it (set it to "" to disable profiles).
+#
+# .dotsignore: one path per line (relative to $HOME or to the repo, or
+# absolute) that `check` should not report as untracked; "#" starts a comment.
+# Each profile can add its own profiles/<name>/.dotsignore. It does not
+# affect `link`.
+#
+# Usage:
+#   dots <command> [options]
+#
+# Commands:
+#   link [--dry-run] [--force|-f] [--profile NAME] [PATH...]
+#       Symlink every tracked file into $HOME. An existing regular file is
+#       moved to <file>.bak first (skipped if <file>.bak already exists).
+#       A symlink pointing elsewhere is left alone unless --force is given.
+#       With PATHs, only link the tracked files at or under them (and skip
+#       installing ~/.local/bin/dots). A PATH can be a repo path (config/nvim),
+#       a $HOME path (~/.config/nvim) or a path relative to the current dir.
+#   unlink [--dry-run] [--restore]
+#       Remove the symlinks that point into the repo (shared files and every
+#       profile). With --restore, move <file>.bak back into place.
+#   check [--interactive|-i] [--profile NAME]
+#       List tracked files that are not symlinked, and files in linked
+#       directories that are not in the repo. With -i, offer to `add` each
+#       untracked file.
+#   add [--profile NAME] FILE
+#       Move FILE (which must be under ~/.config, ~/.local or ~/.pi) into the
+#       repo, or into the profile, and replace it with a symlink.
+#   ignore [--profile NAME] PATH
+#       Add PATH (under $HOME) to .dotsignore, or to the profile's.
+#   profile [list | set NAME | unset]
+#       Show, list, switch or clear the active profile.
+#   diff [GIT_ARGS...]      Run git diff in the repo.
+#   status [GIT_ARGS...]    Run git status in the repo.
+#   help                    Show usage.
+#
+# Examples:
+#   ./dots.sh link                          # first-time setup, from the repo
+#   dots link --dry-run                     # preview what link would do
+#   dots link --force                       # also replace foreign symlinks
+#   dots link config/nvim ~/.config/fish    # link only nvim and fish configs
+#   dots link --dry-run pi/agent/AGENTS.md  # preview linking a single file
+#   dots check -i                           # review and adopt new config files
+#   dots add ~/.config/foo/foo.toml         # start tracking a file
+#   dots add --profile work ~/.config/git/config
+#   dots ignore ~/.config/fish/fish_variables
+#   dots profile set work && dots link
+#   DOTS_PROFILE=work dots link --dry-run   # try a profile without switching
+#   dots unlink --restore                   # undo link, bring back .bak files
+#
+# Compatibility: must run on bash 3.2 (macOS /bin/bash) with BSD tools, so no
+# associative arrays, namerefs or other bash 4+ features, empty arrays are
+# expanded as ${arr[@]+"${arr[@]}"} (plain "${arr[@]}" fails with set -u),
+# and no GNU-only flags such as readlink -f.
+#
 set -euo pipefail
+
+# With CDPATH set, `cd` prints the directory it changed to, which would end up
+# in $(cd ... && pwd) results such as REPO_DIR
+unset CDPATH
 
 resolve_link() {
     local path="$1" target
@@ -48,19 +123,40 @@ load_profile() {
     fi
 }
 
+check_profile_name() {
+    local name="$1"
+    if [[ -z "$name" || "$name" == */* || "$name" == .* ]]; then
+        echo "Error: invalid profile name '$name'." >&2
+        exit 1
+    fi
+}
+
+# Load the active profile, apply a --profile override and make sure it exists
+resolve_profile() {
+    local override="$1"
+    load_profile
+    [[ -n "$override" ]] && ACTIVE_PROFILE="$override"
+    [[ -z "$ACTIVE_PROFILE" ]] && return 0
+    check_profile_name "$ACTIVE_PROFILE"
+    if [[ ! -d "$REPO_DIR/profiles/$ACTIVE_PROFILE" ]]; then
+        echo "Error: profile '$ACTIVE_PROFILE' not found in profiles/ (see '$SCRIPT_NAME profile list')." >&2
+        exit 1
+    fi
+}
+
 usage() {
     cat <<EOF
 Usage: $SCRIPT_NAME <command> [options]
 
 Commands:
-  link              Create symlinks for all tracked files in \$HOME
-  unlink            Remove symlinks created by link (restores .bak files)
-  check             List files in linked directories not tracked in the repo
+  link [path...]    Create symlinks for all tracked files (or only those under path) in \$HOME
+  unlink            Remove symlinks created by link
+  check             List tracked files not symlinked and untracked files in linked dirs
   add <file>        Copy a file into the repo and replace it with a symlink
   ignore <path>     Resolve path and add it to .dotsignore
   profile           Manage profiles (set, list, unset)
   diff [args]       Run git diff in the repo directory
-  status            Show git status of the repo directory
+  status [args]     Show git status of the repo directory
   help              Show this help message
 
 Options:
@@ -70,6 +166,11 @@ Options:
   --interactive, -i For check: prompt before adding each untracked file
   --profile <name>  For add/ignore/link/check: target a specific profile
 EOF
+    exit "${1:-1}"
+}
+
+unknown_option() {
+    echo "Error: unknown option for $1: $2" >&2
     exit 1
 }
 
@@ -78,32 +179,33 @@ EOF
 DOTSIGNORE_FILE="$REPO_DIR/.dotsignore"
 DOTSIGNORE_PATHS=()
 
+# Append the non-comment, non-empty lines of an ignore file to DOTSIGNORE_PATHS
+read_ignore_file() {
+    local f="$1" line
+    [[ -f "$f" ]] || return 0
+    while IFS= read -r line || [[ -n "$line" ]]; do
+        line="${line%%#*}"
+        line="${line#"${line%%[![:space:]]*}"}"
+        line="${line%"${line##*[![:space:]]}"}"
+        [[ -z "$line" ]] && continue
+        DOTSIGNORE_PATHS+=("$line")
+    done < "$f"
+}
+
 load_dotsignore() {
     DOTSIGNORE_PATHS=()
-    local files=("$DOTSIGNORE_FILE")
+    read_ignore_file "$DOTSIGNORE_FILE"
     if [[ -n "$ACTIVE_PROFILE" ]]; then
-        local pf="$REPO_DIR/profiles/$ACTIVE_PROFILE/.dotsignore"
-        [[ -f "$pf" ]] && files+=("$pf")
+        read_ignore_file "$REPO_DIR/profiles/$ACTIVE_PROFILE/.dotsignore"
     fi
-    local f line
-    for f in "${files[@]}"; do
-        [[ -f "$f" ]] || continue
-        while IFS= read -r line || [[ -n "$line" ]]; do
-            line="${line%%#*}"
-            line="${line#"${line%%[![:space:]]*}"}"
-            line="${line%"${line##*[![:space:]]}"}"
-            [[ -z "$line" ]] && continue
-            DOTSIGNORE_PATHS+=("$line")
-        done < "$f"
-    done
 }
 
 is_ignored() {
     local target_path="$1"
     local repo_rel="$2"
-    local home_rel="${target_path#$HOME/}"
+    local home_rel="${target_path#"$HOME"/}"
     local pattern
-    for pattern in "${DOTSIGNORE_PATHS[@]}"; do
+    for pattern in ${DOTSIGNORE_PATHS[@]+"${DOTSIGNORE_PATHS[@]}"}; do
         local pat="${pattern%/}"
         if [[ "$repo_rel" == "$pat" || "$repo_rel" == "$pat"/* ]] || \
            [[ "$home_rel" == "$pat" || "$home_rel" == "$pat"/* ]] || \
@@ -134,13 +236,54 @@ get_profile_files() {
     done
 }
 
+# Tracked files to link, as parallel arrays: TARGET_PATHS[i] (in $HOME) links
+# to TARGET_FILES[i] (in the repo). Filled by collect_targets.
+TARGET_PATHS=()
+TARGET_FILES=()
+
+# Collect the shared files plus the active profile's files; a profile file
+# replaces the shared file with the same path
+collect_targets() {
+    TARGET_PATHS=()
+    TARGET_FILES=()
+    local file rel prof_dir=""
+    [[ -n "$ACTIVE_PROFILE" ]] && prof_dir="$REPO_DIR/profiles/$ACTIVE_PROFILE"
+
+    while IFS= read -r -d '' file; do
+        rel="${file#"$REPO_DIR"/}"
+        should_include "$rel" || continue
+        [[ -n "$prof_dir" && -f "$prof_dir/$rel" ]] && continue
+        TARGET_PATHS+=("$(to_target_path "$rel")")
+        TARGET_FILES+=("$file")
+    done < <(get_shared_files)
+
+    if [[ -n "$prof_dir" ]]; then
+        while IFS= read -r -d '' file; do
+            rel="${file#"$prof_dir"/}"
+            should_include "$rel" || continue
+            TARGET_PATHS+=("$(to_target_path "$rel")")
+            TARGET_FILES+=("$file")
+        done < <(get_profile_files "$ACTIVE_PROFILE")
+    fi
+}
+
+# True if $1 is equal to one of the remaining arguments
+contains() {
+    local needle="$1" item
+    shift
+    for item in "$@"; do
+        [[ "$item" == "$needle" ]] && return 0
+    done
+    return 1
+}
+
 # ─── OS / filtering ────────────────────────────────────────
 
 is_linux_only() {
     local path="$1"
     local lp
     for lp in "${LINUX_ONLY_PATHS[@]}"; do
-        [[ "$path" == "$lp"* ]] && return 0
+        [[ "$path" == "$lp" || "$path" == "$lp"/* ]] && return 0
     done
     return 1
 }
@@ -174,25 +317,13 @@ to_target_path() {
     fi
 
     local target="$HOME/$mapped_first"
-    if [[ -n "$rest" ]]; then
-        target="$target/$(process_path_components "$rest")"
-    fi
+    [[ -n "$rest" ]] && target="$target/$rest"
     echo "$target"
-}
-
-process_path_components() {
-    local path="$1"
-    local result="" part
-    IFS='/' read -ra parts <<< "$path"
-    for part in "${parts[@]}"; do
-        result="${result}/${part}"
-    done
-    echo "${result#/}"
 }
 
 to_repo_path() {
     local target_path="$1"
-    local rel="${target_path#$HOME/}"
+    local rel="${target_path#"$HOME"/}"
 
     local first="${rel%%/*}"
     local rest=""
@@ -220,102 +351,200 @@ to_repo_path() {
     echo "$result"
 }
 
+# Expand a leading ~ (as in a quoted "~/foo"). Not ${1/#\~/"$HOME"}: bash 3.2
+# keeps the quotes of the replacement literally.
+expand_tilde() {
+    local path="$1"
+    if [[ "$path" == "~" || "$path" == "~/"* ]]; then
+        path="$HOME${path:1}"
+    fi
+    echo "$path"
+}
+
+# Absolute path of $1 (with a leading ~ expanded) without resolving symlinks,
+# so a file under a symlinked directory keeps its path under $HOME
+abs_path() {
+    local path dir
+    path="$(expand_tilde "$1")"
+    path="${path%/}"
+    [[ "$path" == /* ]] || path="$PWD/$path"
+    if [[ "$path" == */. || "$path" == */.. ]]; then
+        (cd "$path" 2>/dev/null && pwd)
+        return
+    fi
+    dir="$(cd "$(dirname "$path")" 2>/dev/null && pwd)" || return 1
+    echo "${dir%/}/$(basename "$path")"
+}
+
+# True if $1 (an absolute path) is inside one of the mapped $HOME directories
+is_under_mapped_dir() {
+    local path="$1" mapping
+    for mapping in "${DIR_MAPPINGS[@]}"; do
+        [[ "$path" == "$HOME/${mapping#*:}"/* ]] && return 0
+    done
+    return 1
+}
+
+# Convert a `link` PATH argument to the $HOME path it covers. Accepts repo
+# paths (config/nvim, profiles/work/config/git), $HOME paths (~/.config/nvim)
+# and paths relative to the current directory
+to_link_filter() {
+    local path first mapping rel
+    path="$(expand_tilde "$1")"
+    path="${path%/}"
+
+    if [[ -e "$path" || -L "$path" ]]; then
+        path=$(abs_path "$path") || return 1
+    elif [[ "$path" != /* ]]; then
+        # Not relative to the current dir: try as a repo or $HOME-relative path
+        first="${path%%/*}"
+        for mapping in "${DIR_MAPPINGS[@]}"; do
+            if [[ "$first" == "${mapping%%:*}" ]]; then
+                to_target_path "$path"
+                return 0
+            elif [[ "$first" == "${mapping#*:}" ]]; then
+                echo "$HOME/$path"
+                return 0
+            fi
+        done
+        return 1
+    fi
+
+    if [[ "$path" == "$REPO_DIR"/* ]]; then
+        rel="${path#"$REPO_DIR"/}"
+        [[ "$rel" == profiles/*/* ]] && rel="${rel#profiles/*/}"
+        to_target_path "$rel"
+    elif [[ "$path" == "$HOME"/* ]]; then
+        echo "$path"
+    else
+        return 1
+    fi
+}
+
 # ─── Commands ───────────────────────────────────────────────
 
 cmd_link() {
     local dry_run=false force=false
     local profile_override=""
+    local paths=()
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --dry-run) dry_run=true; shift ;;
             --force|-f) force=true; shift ;;
             --profile) [[ $# -ge 2 ]] && { profile_override="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
-            *) shift ;;
+            --) shift; paths+=("$@"); break ;;
+            -*) unknown_option link "$1" ;;
+            *) paths+=("$1"); shift ;;
         esac
     done
 
-    load_profile
-    [[ -n "$profile_override" ]] && ACTIVE_PROFILE="$profile_override"
+    resolve_profile "$profile_override"
 
-    declare -A targets
-    local file rel tgt
+    collect_targets
 
-    while IFS= read -r -d '' file; do
-        rel="${file#$REPO_DIR/}"
-        ! should_include "$rel" && continue
-        tgt=$(to_target_path "$rel")
-        targets["$tgt"]="$file"
-    done < <(get_shared_files)
+    local count=0 i file tgt cur
 
-    if [[ -n "$ACTIVE_PROFILE" ]]; then
-        local prof_dir="$REPO_DIR/profiles/$ACTIVE_PROFILE"
-        while IFS= read -r -d '' file; do
-            rel="${file#$prof_dir/}"
-            ! should_include "$rel" && continue
-            tgt=$(to_target_path "$rel")
-            targets["$tgt"]="$file"
-        done < <(get_profile_files "$ACTIVE_PROFILE")
+    # Only keep the targets at or under the given paths
+    if [[ ${#paths[@]} -gt 0 ]]; then
+        local sel_paths=() sel_files=()
+        local p filter matched
+        for p in "${paths[@]}"; do
+            filter=$(to_link_filter "$p") || {
+                echo "Error: '$p' is not a repo path or a path under ~/.config, ~/.local or ~/.pi." >&2
+                exit 1
+            }
+            matched=false
+            for ((i = 0; i < ${#TARGET_PATHS[@]}; i++)); do
+                tgt="${TARGET_PATHS[i]}"
+                [[ "$tgt" == "$filter" || "$tgt" == "$filter"/* ]] || continue
+                matched=true
+                # Overlapping PATHs (config and config/nvim) select a file twice
+                contains "$tgt" ${sel_paths[@]+"${sel_paths[@]}"} && continue
+                sel_paths+=("$tgt")
+                sel_files+=("${TARGET_FILES[i]}")
+            done
+            $matched || { echo "Error: no tracked files match '$p' ($filter)." >&2; exit 1; }
+        done
+        TARGET_PATHS=("${sel_paths[@]}")
+        TARGET_FILES=("${sel_files[@]}")
     fi
 
-    local count=0 tgt_dir cur
-    for tgt in "${!targets[@]}"; do
-        file="${targets[$tgt]}"
-        tgt_dir=$(dirname "$tgt")
-
-        if $dry_run; then
-            echo "[DRY RUN] $tgt -> $file"
-            ((++count))
-            continue
-        fi
-
-        mkdir -p "$tgt_dir"
+    for ((i = 0; i < ${#TARGET_PATHS[@]}; i++)); do
+        tgt="${TARGET_PATHS[i]}"
+        file="${TARGET_FILES[i]}"
 
         if [[ -L "$tgt" ]]; then
             cur=$(readlink "$tgt")
             [[ "$cur" == "$file" ]] && continue
-            if $force; then
-                ln -sf "$file" "$tgt"
-                echo "Linked (forced): $tgt -> $file"
-                ((++count))
+            if ! $force; then
+                echo "Warning: $tgt links to $cur (expected $file). Skipping." >&2
+                continue
+            fi
+            if $dry_run; then
+                echo "[DRY RUN] $tgt -> $file (replacing link to $cur)"
             else
-                echo "Warning: $tgt links to $cur (expected $file). Skipping."
+                ln -sfn "$file" "$tgt"
+                echo "Linked (forced): $tgt -> $file"
             fi
         elif [[ -e "$tgt" ]]; then
-            mv "$tgt" "$tgt.bak"
-            echo "Backed up: $tgt -> $tgt.bak"
-            ln -s "$file" "$tgt"
-            echo "Linked: $tgt -> $file"
-            ((++count))
+            # A parent directory is a symlink into the repo, so $tgt already
+            # is the repo file; moving it to .bak would move the repo file
+            if [[ "$tgt" -ef "$file" ]]; then
+                echo "Warning: $tgt already resolves to $file through a symlinked parent directory. Skipping." >&2
+                continue
+            fi
+            if [[ -e "$tgt.bak" || -L "$tgt.bak" ]]; then
+                echo "Warning: $tgt exists and $tgt.bak is already taken. Skipping." >&2
+                continue
+            fi
+            if $dry_run; then
+                echo "[DRY RUN] $tgt -> $file (backing up existing file to $tgt.bak)"
+            else
+                mv "$tgt" "$tgt.bak"
+                echo "Backed up: $tgt -> $tgt.bak"
+                ln -s "$file" "$tgt"
+                echo "Linked: $tgt -> $file"
+            fi
         else
-            ln -s "$file" "$tgt"
-            echo "Linked: $tgt -> $file"
-            ((++count))
+            if $dry_run; then
+                echo "[DRY RUN] $tgt -> $file"
+            else
+                mkdir -p "$(dirname "$tgt")"
+                ln -s "$file" "$tgt"
+                echo "Linked: $tgt -> $file"
+            fi
         fi
+        ((++count))
     done
 
     local self_target="$HOME/.local/bin/dots"
-    if ! $dry_run; then
-        mkdir -p "$HOME/.local/bin"
-        if [[ -L "$self_target" ]]; then
-            local self_cur; self_cur=$(readlink "$self_target")
-            if [[ "$self_cur" != "$REPO_DIR/dots.sh" ]]; then
-                ln -sf "$REPO_DIR/dots.sh" "$self_target"
-                echo "Linked: $self_target -> $REPO_DIR/dots.sh"
-                ((++count))
-            fi
-        elif [[ ! -e "$self_target" ]]; then
-            ln -s "$REPO_DIR/dots.sh" "$self_target"
-            echo "Linked: $self_target -> $REPO_DIR/dots.sh"
-            ((++count))
+    local self_src="$REPO_DIR/dots.sh"
+    local needs_self=true
+    if [[ ${#paths[@]} -gt 0 ]]; then
+        needs_self=false
+    elif [[ -L "$self_target" ]]; then
+        [[ "$(readlink "$self_target")" == "$self_src" ]] && needs_self=false
+    elif [[ -e "$self_target" ]]; then
+        echo "Warning: $self_target exists and is not a symlink. Skipping." >&2
+        needs_self=false
+    fi
+    if $needs_self; then
+        if $dry_run; then
+            echo "[DRY RUN] $self_target -> $self_src"
+        else
+            mkdir -p "$(dirname "$self_target")"
+            ln -sfn "$self_src" "$self_target"
+            echo "Linked: $self_target -> $self_src"
         fi
-    elif [[ ! -L "$self_target" && ! -e "$self_target" ]] || \
-         { [[ -L "$self_target" ]] && [[ "$(readlink "$self_target")" != "$REPO_DIR/dots.sh" ]]; }; then
-        echo "[DRY RUN] $self_target -> $REPO_DIR/dots.sh"
         ((++count))
     fi
 
-    $dry_run && echo "[DRY RUN] Would create $count symlinks."
+    if $dry_run; then
+        echo "[DRY RUN] Would create $count symlinks."
+    elif [[ $count -eq 0 ]]; then
+        echo "Everything is already linked."
+    fi
     return 0
 }
 
@@ -327,73 +556,45 @@ cmd_check() {
         case "$1" in
             --interactive|-i) interactive=true; shift ;;
             --profile) [[ $# -ge 2 ]] && { profile_override="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
-            *) shift ;;
+            *) unknown_option check "$1" ;;
         esac
     done
 
-    load_profile
-    [[ -n "$profile_override" ]] && ACTIVE_PROFILE="$profile_override"
+    resolve_profile "$profile_override"
     load_dotsignore
 
-    local file rel tgt entry lt rp
+    local i file tgt tgt_dir entry lt rp
     local unlinked=()
     local untracked=()
 
-    # Build tracked set (shared + profile)
-    declare -A tracked
-    while IFS= read -r -d '' file; do
-        rel="${file#$REPO_DIR/}"
-        ! should_include "$rel" && continue
-        tracked["$file"]=1
-    done < <(get_shared_files)
-
-    if [[ -n "$ACTIVE_PROFILE" ]]; then
-        local prof_dir="$REPO_DIR/profiles/$ACTIVE_PROFILE"
-        while IFS= read -r -d '' file; do
-            rel="${file#$prof_dir/}"
-            ! should_include "$rel" && continue
-            tracked["$file"]=1
-        done < <(get_profile_files "$ACTIVE_PROFILE")
-    fi
+    collect_targets
 
     # ── List 1: non-linked files (tracked in repo but not symlinked) ──
-    for file in "${!tracked[@]}"; do
-        if [[ "$file" == "$REPO_DIR/profiles/"* ]]; then
-            rel="${file#$REPO_DIR/profiles/$ACTIVE_PROFILE/}"
-        else
-            rel="${file#$REPO_DIR/}"
-        fi
-        tgt=$(to_target_path "$rel")
-        if [[ -L "$tgt" ]]; then
-            lt=$(readlink "$tgt")
-            [[ "$lt" == "$file" ]] && continue
-        fi
-        unlinked+=("$rel")
+    for ((i = 0; i < ${#TARGET_PATHS[@]}; i++)); do
+        tgt="${TARGET_PATHS[i]}"
+        file="${TARGET_FILES[i]}"
+        [[ -L "$tgt" && "$(readlink "$tgt")" == "$file" ]] && continue
+        unlinked+=("${file#"$REPO_DIR"/}")
     done
 
     # ── List 2: untracked files ──
-    local -A top_targets
-    local mapping tn
+    # Scan the dirs holding tracked files, except the top-level ones
+    # (~/.config itself etc.), which hold too many unrelated files
+    local top_targets=() mapping
     for mapping in "${DIR_MAPPINGS[@]}"; do
-        tn="${mapping#*:}"
-        top_targets["$HOME/$tn"]=1
+        top_targets+=("$HOME/${mapping#*:}")
     done
 
-    declare -A target_dirs
-    for file in "${!tracked[@]}"; do
-        if [[ "$file" == "$REPO_DIR/profiles/"* ]]; then
-            rel="${file#$REPO_DIR/profiles/$ACTIVE_PROFILE/}"
-        else
-            rel="${file#$REPO_DIR/}"
-        fi
-        tgt=$(to_target_path "$rel")
-        tgt_dir=$(dirname "$tgt")
-        [[ -n "${top_targets[$tgt_dir]:-}" ]] && continue
-        target_dirs["$tgt_dir"]=1
+    local target_dirs=()
+    for ((i = 0; i < ${#TARGET_PATHS[@]}; i++)); do
+        tgt_dir=$(dirname "${TARGET_PATHS[i]}")
+        contains "$tgt_dir" "${top_targets[@]}" && continue
+        contains "$tgt_dir" ${target_dirs[@]+"${target_dirs[@]}"} && continue
+        target_dirs+=("$tgt_dir")
     done
 
     local dir
-    for dir in "${!target_dirs[@]}"; do
+    for dir in ${target_dirs[@]+"${target_dirs[@]}"}; do
         [[ -d "$dir" ]] || continue
         [[ "$dir" == "$HOME/.local/bin" ]] && continue
 
@@ -402,7 +603,7 @@ cmd_check() {
 
             if [[ -L "$entry" ]]; then
                 lt=$(readlink "$entry")
-                [[ "$lt" == "$REPO_DIR"* ]] && continue
+                [[ "$lt" == "$REPO_DIR"/* ]] && continue
             fi
 
             rp=$(to_repo_path "$entry")
@@ -440,10 +641,11 @@ cmd_check() {
     if $interactive && [[ ${#untracked[@]} -gt 0 ]]; then
         local f yn
         for f in "${untracked[@]}"; do
-            read -rp "Add '$f' to the repo? [Y/n] " yn
+            read -rp "Add '$f' to the repo? [Y/n] " yn || { echo; break; }
             case "$yn" in
                 [Nn]*) ;;
-                *) cmd_add "$f" ;;
+                # Subshell so a failed add skips the file instead of aborting
+                *) ( cmd_add "$f" ) || echo "Skipped: $f" >&2 ;;
             esac
         done
     fi
@@ -456,28 +658,41 @@ cmd_add() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --profile) [[ $# -ge 2 ]] && { profile_name="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
-            --) shift; target_file="$1"; shift ;;
-            *)  target_file="$1"; shift ;;
+            --) shift; [[ $# -gt 0 ]] && { target_file="$1"; shift; } ;;
+            -*) unknown_option add "$1" ;;
+            *)
+                [[ -n "$target_file" ]] && { echo "Error: add takes a single file." >&2; exit 1; }
+                target_file="$1"; shift ;;
         esac
     done
 
     [[ -z "$target_file" ]] && { echo "Error: add requires a file path." >&2; exit 1; }
+    target_file="$(expand_tilde "$target_file")"
+    [[ -n "$profile_name" ]] && check_profile_name "$profile_name"
     [[ -f "$target_file" || -L "$target_file" ]] || {
-        echo "Error: $target_file does not exist." >&2
+        echo "Error: $target_file does not exist or is not a file." >&2
         exit 1
     }
 
-    if [[ -L "$target_file" ]]; then
-        local real_f
-        real_f=$(readlink -f "$target_file")
-        if [[ "$real_f" == "$REPO_DIR"* ]]; then
-            echo "Error: $target_file is already managed by this repo." >&2
-            exit 1
-        fi
+    local abs
+    abs=$(abs_path "$target_file") || {
+        echo "Error: cannot resolve path '$target_file'." >&2
+        exit 1
+    }
+
+    if [[ "$abs" == "$REPO_DIR"/* ]] || \
+       { [[ -L "$abs" ]] && [[ "$(resolve_link "$abs")" == "$REPO_DIR"/* ]]; }; then
+        echo "Error: $target_file is already managed by this repo." >&2
+        exit 1
+    fi
+
+    if ! is_under_mapped_dir "$abs"; then
+        echo "Error: $abs is not under a linked directory (~/.config, ~/.local or ~/.pi)." >&2
+        exit 1
     fi
 
     local repo_rel repo_full
-    repo_rel=$(to_repo_path "$target_file")
+    repo_rel=$(to_repo_path "$abs")
 
     if [[ -n "$profile_name" ]]; then
         repo_full="$REPO_DIR/profiles/$profile_name/$repo_rel"
@@ -490,14 +705,19 @@ cmd_add() {
         exit 1
     fi
 
-    mkdir -p "$(dirname "$repo_full")"
+    # Checked explicitly: errexit is off when called from `check -i`, and the
+    # original must not be removed unless the copy succeeded
+    mkdir -p "$(dirname "$repo_full")" && cp -p "$abs" "$repo_full" || {
+        echo "Error: failed to copy $abs to $repo_full." >&2
+        exit 1
+    }
 
-    cp "$target_file" "$repo_full"
-    [[ -x "$target_file" ]] && chmod +x "$repo_full"
-
-    rm -f "$target_file"
-    ln -s "$repo_full" "$target_file"
-    echo "Added: $target_file -> $repo_full"
+    rm -f "$abs"
+    ln -s "$repo_full" "$abs" || {
+        echo "Error: failed to link $abs; the file is saved at $repo_full." >&2
+        exit 1
+    }
+    echo "Added: $abs -> $repo_full"
 }
 
 cmd_ignore() {
@@ -507,162 +727,125 @@ cmd_ignore() {
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --profile) [[ $# -ge 2 ]] && { profile_name="$2"; shift 2; } || { echo "Error: --profile requires a name." >&2; exit 1; } ;;
-            --) shift; raw_path="$1"; shift ;;
-            *)  raw_path="$1"; shift ;;
+            --) shift; [[ $# -gt 0 ]] && { raw_path="$1"; shift; } ;;
+            -*) unknown_option ignore "$1" ;;
+            *)
+                [[ -n "$raw_path" ]] && { echo "Error: ignore takes a single path." >&2; exit 1; }
+                raw_path="$1"; shift ;;
         esac
     done
 
     [[ -z "$raw_path" ]] && { echo "Error: ignore requires a file path." >&2; exit 1; }
+    [[ -n "$profile_name" ]] && check_profile_name "$profile_name"
 
-    local expanded="${raw_path/#\~/$HOME}"
-    expanded="${expanded%/}"
-    local dir dir_abs base abs_path
-    dir="$(dirname "$expanded")"
-    dir_abs="$(realpath "$dir" 2>/dev/null)" || {
+    local abs
+    abs=$(abs_path "$raw_path") || {
         echo "Error: cannot resolve path '$raw_path'." >&2
         exit 1
     }
-    base="$(basename "$expanded")"
-    abs_path="$dir_abs/$base"
 
-    [[ "$abs_path" == "$HOME"* ]] || {
+    [[ "$abs" == "$HOME"/* ]] || {
         echo "Error: path '$raw_path' is not under \$HOME ($HOME)." >&2
         exit 1
     }
 
-    local home_rel="${abs_path#$HOME/}"
+    local home_rel="${abs#"$HOME"/}"
 
     local ignore_file="$DOTSIGNORE_FILE"
     if [[ -n "$profile_name" ]]; then
         ignore_file="$REPO_DIR/profiles/$profile_name/.dotsignore"
-        [[ -d "$(dirname "$ignore_file")" ]] || mkdir -p "$(dirname "$ignore_file")"
+        mkdir -p "$(dirname "$ignore_file")"
     fi
 
     # Load relevant ignores for duplicate check
     DOTSIGNORE_PATHS=()
-    if [[ -f "$ignore_file" ]]; then
-        local line
-        while IFS= read -r line || [[ -n "$line" ]]; do
-            line="${line%%#*}"
-            line="${line#"${line%%[![:space:]]*}"}"
-            line="${line%"${line##*[![:space:]]}"}"
-            [[ -z "$line" ]] && continue
-            DOTSIGNORE_PATHS+=("$line")
-        done < "$ignore_file"
-    fi
+    read_ignore_file "$ignore_file"
 
     local pattern
-    for pattern in "${DOTSIGNORE_PATHS[@]}"; do
+    for pattern in ${DOTSIGNORE_PATHS[@]+"${DOTSIGNORE_PATHS[@]}"}; do
         [[ "$pattern" == "$home_rel" ]] && {
             echo "Already ignored: $home_rel"
             return 0
         }
     done
 
-    if [[ -f "$ignore_file" ]]; then
+    if [[ -s "$ignore_file" ]]; then
         local file_end
         file_end="$(tail -c 1 "$ignore_file"; echo x)"
         file_end="${file_end%x}"
         [[ "$file_end" == $'\n' ]] || printf '\n' >> "$ignore_file"
     fi
     echo "$home_rel" >> "$ignore_file"
-    echo "Added to .dotsignore: $home_rel"
+    echo "Added to ${ignore_file#"$REPO_DIR"/}: $home_rel"
 }
 
-cmd_unlink() {
-    local dry_run=false restore=false
+# Remove $2 if it is a symlink to $1, restoring $2.bak when --restore was given.
+# Uses dry_run, restore and count from the calling cmd_unlink.
+unlink_target() {
+    local file="$1" tgt="$2"
+    [[ -L "$tgt" && "$(readlink "$tgt")" == "$file" ]] || return 0
 
-    for arg in "$@"; do
-        case "$arg" in
-            --dry-run) dry_run=true ;;
-            --restore) restore=true ;;
-        esac
-    done
+    local bak="$tgt.bak" do_restore=false
+    if $restore && [[ -e "$bak" || -L "$bak" ]]; then
+        do_restore=true
+    fi
 
-    local count=0 file rel tgt cur bak
-    declare -A seen_targets
-
-    # Shared files
-    while IFS= read -r -d '' file; do
-        rel="${file#$REPO_DIR/}"
-        ! should_include "$rel" && continue
-        tgt=$(to_target_path "$rel")
-        [[ -n "${seen_targets[$tgt]:-}" ]] && continue
-        seen_targets["$tgt"]=1
-
-        [[ -L "$tgt" ]] || continue
-        cur=$(readlink "$tgt")
-        [[ "$cur" != "$file" ]] && continue
-
-        bak="$tgt.bak"
-        has_bak=false
-        [[ -e "$bak" ]] && has_bak=true
-
-        if $dry_run; then
-            if $has_bak && $restore; then
-                echo "[DRY RUN] Remove $tgt, restore $bak"
-            else
-                echo "[DRY RUN] Remove $tgt"
-            fi
-            ((++count))
-            continue
+    if $dry_run; then
+        if $do_restore; then
+            echo "[DRY RUN] Remove $tgt, restore $bak"
+        else
+            echo "[DRY RUN] Remove $tgt"
         fi
-
+    else
         rm "$tgt"
-
-        if $has_bak && $restore; then
+        if $do_restore; then
             mv "$bak" "$tgt"
             echo "Restored: $tgt <- $bak"
         else
             echo "Removed: $tgt"
         fi
-        ((++count))
+    fi
+    ((++count))
+}
+
+cmd_unlink() {
+    local dry_run=false restore=false
+    local arg
+
+    for arg in "$@"; do
+        case "$arg" in
+            --dry-run) dry_run=true ;;
+            --restore) restore=true ;;
+            *) unknown_option unlink "$arg" ;;
+        esac
+    done
+
+    local count=0 file rel
+
+    # Shared files
+    while IFS= read -r -d '' file; do
+        rel="${file#"$REPO_DIR"/}"
+        should_include "$rel" || continue
+        unlink_target "$file" "$(to_target_path "$rel")"
     done < <(get_shared_files)
 
-    # All profiles
+    # All profiles (a target links to at most one file, so no dedup is needed)
     if [[ -d "$REPO_DIR/profiles" ]]; then
-        local prof profile_dir
+        local prof
         while IFS= read -r -d '' prof; do
-            profile_dir="$(basename "$prof")"
             while IFS= read -r -d '' file; do
-                rel="${file#$prof/}"
-                ! should_include "$rel" && continue
-                tgt=$(to_target_path "$rel")
-                [[ -n "${seen_targets[$tgt]:-}" ]] && continue
-                seen_targets["$tgt"]=1
-
-                [[ -L "$tgt" ]] || continue
-                cur=$(readlink "$tgt")
-                [[ "$cur" != "$file" ]] && continue
-
-                bak="$tgt.bak"
-                has_bak=false
-                [[ -e "$bak" ]] && has_bak=true
-
-                if $dry_run; then
-                    if $has_bak && $restore; then
-                        echo "[DRY RUN] Remove $tgt, restore $bak"
-                    else
-                        echo "[DRY RUN] Remove $tgt"
-                    fi
-                    ((++count))
-                    continue
-                fi
-
-                rm "$tgt"
-
-                if $has_bak && $restore; then
-                    mv "$bak" "$tgt"
-                    echo "Restored: $tgt <- $bak"
-                else
-                    echo "Removed: $tgt"
-                fi
-                ((++count))
-            done < <(get_profile_files "$profile_dir")
+                rel="${file#"$prof"/}"
+                should_include "$rel" || continue
+                unlink_target "$file" "$(to_target_path "$rel")"
+            done < <(get_profile_files "$(basename "$prof")")
         done < <(find "$REPO_DIR/profiles" -mindepth 1 -maxdepth 1 -type d -print0 2>/dev/null)
     fi
 
-    $dry_run && echo "[DRY RUN] Would remove $count symlinks."
+    if $dry_run; then
+        echo "[DRY RUN] Would remove $count symlinks."
+    elif [[ $count -eq 0 ]]; then
+        echo "No symlinks to remove."
+    fi
 }
 
 cmd_diff() {
@@ -670,7 +853,7 @@ cmd_diff() {
 }
 
 cmd_status() {
-    git -C "$REPO_DIR" status
+    git -C "$REPO_DIR" status "$@"
 }
 
 cmd_profile() {
@@ -684,7 +867,12 @@ cmd_profile() {
             local p found=false
             for p in "$REPO_DIR/profiles/"*/; do
                 if [[ -d "$p" ]]; then
-                    echo "  $(basename "$p")"
+                    local name; name="$(basename "$p")"
+                    if [[ "$name" == "$ACTIVE_PROFILE" ]]; then
+                        echo "  $name (active)"
+                    else
+                        echo "  $name"
+                    fi
                     found=true
                 fi
             done
@@ -693,11 +881,12 @@ cmd_profile() {
         set)
             local name="${2:-}"
             [[ -z "$name" ]] && { echo "Error: profile set requires a name." >&2; exit 1; }
+            check_profile_name "$name"
             if [[ -d "$REPO_DIR/profiles/$name" ]]; then
                 mkdir -p "$PROFILE_DIR"
                 echo "$name" > "$PROFILE_FILE"
                 ACTIVE_PROFILE="$name"
-                echo "Switched to profile: $name"
+                echo "Switched to profile: $name (run '$SCRIPT_NAME link' to apply)"
             else
                 echo "Error: profile '$name' not found in profiles/." >&2
                 exit 1
@@ -729,15 +918,15 @@ cmd_profile() {
 
 load_profile
 
-case "${1:-}" in
-    link)   shift; cmd_link "${@:-}" ;;
-    unlink) shift; cmd_unlink "${@:-}" ;;
-    check)  shift; cmd_check "${@:-}" ;;
-    add)    shift; cmd_add "${@:-}" ;;
-    ignore) shift; cmd_ignore "${@:-}" ;;
-    profile) shift; cmd_profile "${@:-}" ;;
+case "$1" in
+    link)    shift; cmd_link "$@" ;;
+    unlink)  shift; cmd_unlink "$@" ;;
+    check)   shift; cmd_check "$@" ;;
+    add)     shift; cmd_add "$@" ;;
+    ignore)  shift; cmd_ignore "$@" ;;
+    profile) shift; cmd_profile "$@" ;;
     diff)    shift; cmd_diff "$@" ;;
-    status)  cmd_status ;;
-    help|--help|-h) usage ;;
-    *)     echo "Unknown command: $1"; usage ;;
+    status)  shift; cmd_status "$@" ;;
+    help|--help|-h) usage 0 ;;
+    *)       echo "Unknown command: $1" >&2; usage ;;
 esac

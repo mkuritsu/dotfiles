@@ -1,5 +1,0 @@
-hl.on("hyprland.start", function()
-	hl.exec_cmd("noctalia")
-	hl.exec_cmd("systemctl start --user vicinae || vicinae server")
-	hl.exec_cmd("gnome-keyring-daemon --start --components=secrets,ssh")
-end)

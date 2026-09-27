@@ -3,11 +3,10 @@
 .config/herdr/herdr-client.log
 .config/herdr/session.json
 .config/herdr/release-notes.json
+.config/herdr/.plugins.lock
 .config/fish/fish_variables
 .config/fish/conf.d/vite-plus.fish
 .config/fish/conf.d/rustup.fish
-.config/fish/conf.d/ssh-askpass.fish
-.config/herdr/.plugins.lock
 .pi/agent/auth.json
 .pi/agent/models-store.json
 .pi/agent/trust.json

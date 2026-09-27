@@ -1,9 +1,91 @@
 #!/usr/bin/env bash
+#
+# perform-backup - create an encrypted zip backup of personal files
+#
+# Zips ~/Documents and ~/Pictures (plus any extra paths given with -a) into
+# ~/Downloads/backup_<unix-timestamp>.zip. The archive is password-protected
+# (zip -e), so the command prompts for a password interactively.
+#
+# Paths inside $HOME are stored relative to $HOME (e.g. Documents/...);
+# paths outside it are stored with their full path minus the leading "/".
+# Relative paths passed to -a are resolved from the current directory.
+# The script exits with an error if a given path does not exist.
+#
+# Usage:
+#   perform-backup [-a PATH]...
+#
+# Flags:
+#   -a, --add PATH   Also include PATH (file or directory). Repeatable.
+#   --add=PATH       Same as --add PATH.
+#   -h, --help       Show help and exit.
+#
+# Examples:
+#   perform-backup                             # Documents + Pictures only
+#   perform-backup -a .config/nvim             # relative to current directory
+#   perform-backup -a ~/Dev/notes.md -a ~/Music
+#   perform-backup --add=/etc/hosts            # path outside $HOME
+#
+
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") [-a PATH]...
+
+Creates an encrypted zip backup of ~/Documents and ~/Pictures in ~/Downloads.
+
+Options:
+  -a, --add PATH   Also include PATH (file or directory) in the backup.
+                   Can be passed multiple times.
+  -h, --help       Show this help and exit.
+EOF
+}
+
+paths=(Documents Pictures)
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -a | --add)
+            if [[ $# -lt 2 ]]; then
+                echo "Error: $1 requires a path" >&2
+                exit 1
+            fi
+            path="$2"
+            shift 2
+            ;;
+        --add=*)
+            path="${1#--add=}"
+            shift
+            ;;
+        -h | --help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Error: unknown argument: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+
+    # Resolve relative to where the script was invoked, since we cd to $HOME later
+    [[ "$path" != /* ]] && path="$PWD/$path"
+    path="${path%/}"
+
+    if [[ ! -e "$path" ]]; then
+        echo "Error: path does not exist: $path" >&2
+        exit 1
+    fi
+
+    # Store paths inside $HOME relative to it, like the defaults
+    [[ "$path" == "$HOME"/* ]] && path="${path#"$HOME"/}"
+    paths+=("$path")
+done
 
 timestamp=$(date +%s)
 backup_file="$HOME/Downloads/backup_${timestamp}.zip"
 
 cd "$HOME"
-zip -erq "$backup_file" Documents Pictures
+zip -erq "$backup_file" "${paths[@]}"
 
 echo "Backup created at: $backup_file"
