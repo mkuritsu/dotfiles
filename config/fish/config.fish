@@ -117,6 +117,10 @@ set -gx EDITOR "nvim"
 ##############
 # SOURCE
 ##############
+if type -q mise
+	mise activate fish | source
+end
+
 if test -f "$HOME/.config/vite-plus/env.fish"
     source "$HOME/.config/vite-plus/env.fish"
 end
@@ -127,10 +131,6 @@ end
 
 if type -q starship
     starship init fish | source
-end
-
-if type -q mise
-	mise activate fish | source
 end
 
 ##############

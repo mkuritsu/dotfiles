@@ -1,19 +1,19 @@
 vim.pack.add({
     -- LSPs, highlithing, suggestions, etc...
-    { src = "https://github.com/folke/lazydev.nvim" },
-    { src = "https://github.com/neovim/nvim-lspconfig" },
-    { src = "https://github.com/mason-org/mason.nvim" },
-    { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
-    { src = "https://github.com/nvim-treesitter/nvim-treesitter",             version = "main" },
-    { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
-    { src = "https://github.com/saghen/blink.cmp",                            version = "v1" },
-    { src = "https://github.com/stevearc/conform.nvim" },
+    -- { src = "https://github.com/folke/lazydev.nvim" },
+    -- { src = "https://github.com/neovim/nvim-lspconfig" },
+    -- { src = "https://github.com/mason-org/mason.nvim" },
+    -- { src = "https://github.com/mason-org/mason-lspconfig.nvim" },
+    -- { src = "https://github.com/nvim-treesitter/nvim-treesitter",             version = "main" },
+    -- { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects", version = "main" },
+    -- { src = "https://github.com/saghen/blink.cmp",                            version = "v1" },
+    -- { src = "https://github.com/stevearc/conform.nvim" },
 
     -- Style/UI
     { src = "https://github.com/catppuccin/nvim",                             name = "catppuccin" },
     { src = "https://github.com/nvim-lualine/lualine.nvim" },
     { src = "https://github.com/nvim-tree/nvim-web-devicons" },
-    { src = "https://github.com/j-hui/fidget.nvim" },
+    -- { src = "https://github.com/j-hui/fidget.nvim" },
 
     -- Utils
     { src = "https://github.com/folke/todo-comments.nvim" },
@@ -75,60 +75,60 @@ local lsps = {
     "dockerls",
 }
 
-vim.lsp.enable("clangd")
-vim.lsp.enable("rust-analyzer")
+-- vim.lsp.enable("clangd")
+-- vim.lsp.enable("rust-analyzer")
 
-require("nvim-treesitter").install(grammars)
-require("nvim-treesitter-textobjects").setup({
-    select = {
-        lookahead = true,
-        selection_modes = {
-            ["@parameter.outer"] = "v",
-            ["@function.outer"] = "V",
-            ["@class.outer"] = "<c-v>",
-        },
-        include_surrounding_whitespace = false,
-    },
-})
+-- require("nvim-treesitter").install(grammars)
+-- require("nvim-treesitter-textobjects").setup({
+--     select = {
+--         lookahead = true,
+--         selection_modes = {
+--             ["@parameter.outer"] = "v",
+--             ["@function.outer"] = "V",
+--             ["@class.outer"] = "<c-v>",
+--         },
+--         include_surrounding_whitespace = false,
+--     },
+-- })
 
-require("mason").setup()
-require("mason-lspconfig").setup({
-    ensure_installed = lsps,
-})
+-- require("mason").setup()
+-- require("mason-lspconfig").setup({
+--     ensure_installed = lsps,
+-- })
 
-require("lazydev").setup({
-    library = {
-        { path = "luvit-meta/library", words = { "vim%.uv" } },
-    },
-})
+-- require("lazydev").setup({
+--     library = {
+--         { path = "luvit-meta/library", words = { "vim%.uv" } },
+--     },
+-- })
 
-local js_formatters = { "oxfmt", "biome", "prettierd", "prettier", stop_after_first = true }
-require("conform").setup({
-    formatters_by_ft = {
-        typescript = js_formatters,
-        typescriptreact = js_formatters,
-        javascript = js_formatters,
-        javascriptreact = js_formatters,
-        astro = js_formatters,
-        json = js_formatters,
-        cpp = { "clang-format" },
-        c = { "clang-format" },
-        lua = { "stylua" },
-        nix = { "alejandra" },
-    },
-    default_format_opts = {
-        lsp_format = "fallback",
-    },
-    format_on_save = { timeout_ms = 1000, lsp_format = "fallback" },
-})
+-- local js_formatters = { "oxfmt", "biome", "prettierd", "prettier", stop_after_first = true }
+-- require("conform").setup({
+--     formatters_by_ft = {
+--         typescript = js_formatters,
+--         typescriptreact = js_formatters,
+--         javascript = js_formatters,
+--         javascriptreact = js_formatters,
+--         astro = js_formatters,
+--         json = js_formatters,
+--         cpp = { "clang-format" },
+--         c = { "clang-format" },
+--         lua = { "stylua" },
+--         nix = { "alejandra" },
+--     },
+--     default_format_opts = {
+--         lsp_format = "fallback",
+--     },
+--     format_on_save = { timeout_ms = 1000, lsp_format = "fallback" },
+-- })
 
--- Suggestions
-require("blink.cmp").setup({
-    keymap = {
-        preset = "enter",
-        ["<Tab>"] = { "accept", "fallback" },
-    },
-})
+-- -- Suggestions
+-- require("blink.cmp").setup({
+--     keymap = {
+--         preset = "enter",
+--         ["<Tab>"] = { "accept", "fallback" },
+--     },
+-- })
 
 -- Navigation
 require("snacks").setup({
@@ -178,7 +178,7 @@ require("lualine").setup({
     },
 })
 
-require("fidget").setup({})
+-- require("fidget").setup({})
 
 require("catppuccin").setup({
     flavour = "macchiato",
