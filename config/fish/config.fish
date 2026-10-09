@@ -1,3 +1,8 @@
+# fix distrobox wrong colors
+if test -n "$CONTAINER_ID"
+    set -g fish_color_autosuggestion 585858
+end
+
 ##############
 # FUNCTIONS
 ##############
