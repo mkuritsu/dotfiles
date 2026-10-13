@@ -7,6 +7,7 @@
 #   config/  -> ~/.config/
 #   local/   -> ~/.local/
 #   pi/      -> ~/.pi/
+#   home/    -> ~/          (e.g. home/.zshrc -> ~/.zshrc)
 # Paths listed in LINUX_ONLY_PATHS (config/hypr, config/uwsm, config/vicinae)
 # are only linked on Linux. `link` also installs this script as
 # ~/.local/bin/dots, so after the first run it can be called as `dots`.
@@ -41,8 +42,9 @@
 #       directories that are not in the repo. With -i, offer to `add` each
 #       untracked file.
 #   add [--profile NAME] FILE
-#       Move FILE (which must be under ~/.config, ~/.local or ~/.pi) into the
-#       repo, or into the profile, and replace it with a symlink.
+#       Move FILE (which must be under $HOME) into the repo, or into the
+#       profile, and replace it with a symlink. Files outside ~/.config,
+#       ~/.local and ~/.pi go into home/.
 #   ignore [--profile NAME] PATH
 #       Add PATH (under $HOME) to .dotsignore, or to the profile's.
 #   profile [list | set NAME | unset]
@@ -93,11 +95,13 @@ REPO_DIR="$(cd "$(dirname "$(resolve_link "$0")")" && pwd)"
 OS="$(uname -s)"
 SCRIPT_NAME="$(basename "$(resolve_link "$0")")"
 
-# Top-level directory mappings (repo_name:target_name)
+# Top-level directory mappings (repo_name:target_name). An empty target_name
+# is $HOME itself; it only gets the paths that no other mapping covers.
 DIR_MAPPINGS=(
     "config:.config"
     "local:.local"
     "pi:.pi"
+    "home:"
 )
 
 # Linux-only directories (relative to repo root)
@@ -302,21 +306,23 @@ to_target_path() {
     local rest=""
     [[ "$first" != "$repo_rel" ]] && rest="${repo_rel#*/}"
 
-    local mapped_first=""
+    local mapped_first="" found=false
     local mapping rn tn
     for mapping in "${DIR_MAPPINGS[@]}"; do
         rn="${mapping%%:*}"
         tn="${mapping#*:}"
         if [[ "$first" == "$rn" ]]; then
             mapped_first="$tn"
+            found=true
             break
         fi
     done
-    if [[ -z "$mapped_first" ]]; then
+    if ! $found; then
         [[ "$first" == dot_* ]] && mapped_first=".${first:4}" || mapped_first="$first"
     fi
 
-    local target="$HOME/$mapped_first"
+    # An empty mapped_first (the home mapping) is $HOME itself
+    local target="$HOME${mapped_first:+/$mapped_first}"
     [[ -n "$rest" ]] && target="$target/$rest"
     echo "$target"
 }
@@ -329,16 +335,23 @@ to_repo_path() {
     local rest=""
     [[ "$first" != "$rel" ]] && rest="${rel#*/}"
 
-    local mapped_first=""
+    local mapped_first="" home_rn=""
     local mapping rn tn
     for mapping in "${DIR_MAPPINGS[@]}"; do
         rn="${mapping%%:*}"
         tn="${mapping#*:}"
-        if [[ "$first" == "$tn" ]]; then
+        if [[ -z "$tn" ]]; then
+            home_rn="$rn"
+        elif [[ "$first" == "$tn" ]]; then
             mapped_first="$rn"
             break
         fi
     done
+    # Not under another mapped dir: the home mapping keeps the whole path
+    if [[ -z "$mapped_first" && -n "$home_rn" ]]; then
+        echo "$home_rn/$rel"
+        return
+    fi
     if [[ -z "$mapped_first" ]]; then
         mapped_first="$first"
     fi
@@ -378,16 +391,19 @@ abs_path() {
 
 # True if $1 (an absolute path) is inside one of the mapped $HOME directories
 is_under_mapped_dir() {
-    local path="$1" mapping
+    local path="$1" mapping tn
     for mapping in "${DIR_MAPPINGS[@]}"; do
-        [[ "$path" == "$HOME/${mapping#*:}"/* ]] && return 0
+        tn="${mapping#*:}"
+        [[ "$path" == "$HOME${tn:+/$tn}"/* ]] && return 0
     done
     return 1
 }
 
-# Convert a `link` PATH argument to the $HOME path it covers. Accepts repo
-# paths (config/nvim, profiles/work/config/git), $HOME paths (~/.config/nvim)
-# and paths relative to the current directory
+# Convert a `link` PATH argument to a filter: "repo:<repo path>" for repo
+# paths (config/nvim, profiles/work/config/git, matched without the profile
+# prefix) or "home:<path>" for $HOME paths (~/.config/nvim). Paths relative to
+# the current directory are accepted too. Repo paths are not converted to the
+# $HOME path they cover, as home/ covers all of $HOME
 to_link_filter() {
     local path first mapping rel
     path="$(expand_tilde "$1")"
@@ -400,10 +416,10 @@ to_link_filter() {
         first="${path%%/*}"
         for mapping in "${DIR_MAPPINGS[@]}"; do
             if [[ "$first" == "${mapping%%:*}" ]]; then
-                to_target_path "$path"
+                echo "repo:$path"
                 return 0
             elif [[ "$first" == "${mapping#*:}" ]]; then
-                echo "$HOME/$path"
+                echo "home:$HOME/$path"
                 return 0
             fi
         done
@@ -413,9 +429,9 @@ to_link_filter() {
     if [[ "$path" == "$REPO_DIR"/* ]]; then
         rel="${path#"$REPO_DIR"/}"
         [[ "$rel" == profiles/*/* ]] && rel="${rel#profiles/*/}"
-        to_target_path "$rel"
+        echo "repo:$rel"
     elif [[ "$path" == "$HOME"/* ]]; then
-        echo "$path"
+        echo "home:$path"
     else
         return 1
     fi
@@ -448,16 +464,24 @@ cmd_link() {
     # Only keep the targets at or under the given paths
     if [[ ${#paths[@]} -gt 0 ]]; then
         local sel_paths=() sel_files=()
-        local p filter matched
+        local p filter kind cand matched
         for p in "${paths[@]}"; do
             filter=$(to_link_filter "$p") || {
-                echo "Error: '$p' is not a repo path or a path under ~/.config, ~/.local or ~/.pi." >&2
+                echo "Error: '$p' is not a repo path or a path under \$HOME." >&2
                 exit 1
             }
+            kind="${filter%%:*}"
+            filter="${filter#*:}"
             matched=false
             for ((i = 0; i < ${#TARGET_PATHS[@]}; i++)); do
                 tgt="${TARGET_PATHS[i]}"
-                [[ "$tgt" == "$filter" || "$tgt" == "$filter"/* ]] || continue
+                if [[ "$kind" == repo ]]; then
+                    cand="${TARGET_FILES[i]#"$REPO_DIR"/}"
+                    [[ "$cand" == profiles/*/* ]] && cand="${cand#profiles/*/}"
+                else
+                    cand="$tgt"
+                fi
+                [[ "$cand" == "$filter" || "$cand" == "$filter"/* ]] || continue
                 matched=true
                 # Overlapping PATHs (config and config/nvim) select a file twice
                 contains "$tgt" ${sel_paths[@]+"${sel_paths[@]}"} && continue
@@ -580,9 +604,10 @@ cmd_check() {
     # ── List 2: untracked files ──
     # Scan the dirs holding tracked files, except the top-level ones
     # (~/.config itself etc.), which hold too many unrelated files
-    local top_targets=() mapping
+    local top_targets=() mapping tn
     for mapping in "${DIR_MAPPINGS[@]}"; do
-        top_targets+=("$HOME/${mapping#*:}")
+        tn="${mapping#*:}"
+        top_targets+=("$HOME${tn:+/$tn}")
     done
 
     local target_dirs=()
@@ -687,7 +712,7 @@ cmd_add() {
     fi
 
     if ! is_under_mapped_dir "$abs"; then
-        echo "Error: $abs is not under a linked directory (~/.config, ~/.local or ~/.pi)." >&2
+        echo "Error: $abs is not under \$HOME ($HOME)." >&2
         exit 1
     fi
 
