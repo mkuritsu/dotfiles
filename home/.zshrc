@@ -14,6 +14,43 @@ zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
 
 ##############
+# KEYBINDINGS
+##############
+bindkey -e
+
+# stop word motions at "/" like fish does
+WORDCHARS=${WORDCHARS//\/}
+
+# up/down search history by the typed prefix, like fish
+autoload -Uz up-line-or-beginning-search down-line-or-beginning-search edit-command-line
+zle -N up-line-or-beginning-search
+zle -N down-line-or-beginning-search
+zle -N edit-command-line
+
+# both normal (CSI) and application (SS3) mode sequences
+bindkey '^[[A'    up-line-or-beginning-search   # up
+bindkey '^[OA'    up-line-or-beginning-search
+bindkey '^[[B'    down-line-or-beginning-search # down
+bindkey '^[OB'    down-line-or-beginning-search
+bindkey '^[[H'    beginning-of-line             # home
+bindkey '^[OH'    beginning-of-line
+bindkey '^[[1~'   beginning-of-line
+bindkey '^[[F'    end-of-line                   # end
+bindkey '^[OF'    end-of-line
+bindkey '^[[4~'   end-of-line
+bindkey '^[[3~'   delete-char                   # delete
+bindkey '^[[1;5D' backward-word                 # ctrl+left
+bindkey '^[[1;5C' forward-word                  # ctrl+right
+bindkey '^[[1;3D' backward-word                 # alt+left
+bindkey '^[[1;3C' forward-word                  # alt+right
+bindkey '^H'      backward-kill-word            # ctrl+backspace
+bindkey '^[^?'    backward-kill-word            # alt+backspace
+bindkey '^[[3;5~' kill-word                     # ctrl+delete
+bindkey '^[[3;3~' kill-word                     # alt+delete
+bindkey '^[[Z'    reverse-menu-complete         # shift+tab
+bindkey '^[e'     edit-command-line             # alt+e, edit in $EDITOR
+
+##############
 # FUNCTIONS
 ##############
 # Paths of all worktrees of the current repo, main checkout first
@@ -36,9 +73,9 @@ __git_branch_worktree() {
     return 1
 }
 
-# Pick a project in ~/Dev or ~/Projects with fzf and cd into it
+# Pick a project in ~/Dev, ~/Dev/tmp or ~/Projects with fzf and cd into it
 cd_fzf() {
-    local -a lookup_dirs=(~/Dev(N/) ~/Projects(N/))
+    local -a lookup_dirs=(~/Dev(N/) ~/Dev/tmp(N/) ~/Projects(N/))
     if (( ${#lookup_dirs} == 0 )); then
         # as a zle message when running from the key binding
         if [[ -n "$WIDGET" ]]; then
@@ -195,6 +232,7 @@ alias cf-curl="cloudflared access curl"
 ##############
 typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[arg0]=none
+ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 ZSH_HIGHLIGHT_STYLES[precommand]=underline
 ZSH_HIGHLIGHT_STYLES[suffix-alias]=underline
 ZSH_HIGHLIGHT_STYLES[autodirectory]=underline

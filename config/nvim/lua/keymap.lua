@@ -1,17 +1,3 @@
--- -- Utility functions
--- local function set_textobject_keymap(keymap, selection)
---     vim.keymap.set("v", keymap, function()
---         require("nvim-treesitter-textobjects.select").select_textobject(selection, "textobjects")
---     end)
--- end
-
--- -- Textobjects
--- set_textobject_keymap("af", "@function.outer")
--- set_textobject_keymap("if", "@function.inner")
--- set_textobject_keymap("ac", "@class.outer")
--- set_textobject_keymap("ic", "@class.inner")
--- set_textobject_keymap("as", "@local.scope")
-
 -- Snacks picker
 vim.keymap.set("n", "<leader>f", function()
     Snacks.picker.files()
